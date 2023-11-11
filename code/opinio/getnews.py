@@ -5,7 +5,25 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC  # noqa: F401
 from selenium.webdriver.edge.options import Options
 import datetime
+import requests
 import time
+
+
+# Function to get the html of where we are after signing in
+def GetHtml(driver):
+    """
+    This function saves the html of the current page to a file
+    """
+    try:
+        html = driver.page_source
+        print("HTML gotten")
+
+        with open('page.html', 'w', encoding='utf-8') as file:
+            file.write(html)
+        print("File written")
+
+    except Exception as e:
+        print("Error getting HTML: ", e)
 
 
 def Sign_In(driver):
@@ -168,11 +186,11 @@ if __name__ == '__main__':
     accept_cookies(edge_driver)
 
     # Enter email
-    email = "armand.lacombled"
+    email = "armane.fr"
     Enter_Email(edge_driver, email)
 
     # Enter password
-    password = "1458"
+    password = "El6"
     Enter_Password(edge_driver, password)
 
     # Uncheck remember me
@@ -180,6 +198,9 @@ if __name__ == '__main__':
 
     # Sign in
     Sign_In(edge_driver)
+
+    # Get HTML
+    GetHtml(edge_driver)
 
     # Close driver
     edge_driver.close()

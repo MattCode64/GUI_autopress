@@ -4,7 +4,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC  # noqa: F401
-from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.edge.options import Options
 import time
 
 
@@ -15,10 +15,6 @@ def get_number_of_pages(driver):
 
 
 def setup(driver):
-    # Mettre en plein écran
-    driver.maximize_window()
-    # time.sleep(2)
-
     # Aller sur le site
     driver.get("https://www.lopinion.fr/")
 
@@ -211,14 +207,19 @@ if __name__ == '__main__':
     print("Début du script")
     # Initialisation
     pdf_merger = PdfMerger()
-    path = r"C:\Data\PC\WebDriver\chromedriver.exe"
+    # path = r"C:\Data\PC\WebDriver\chromedriver.exe"
+    path = r"D:\WEBDRIVER\edge\edgedriver_win64\msedgedriver.exe"
 
     # Ouvrir le navigateur
     print("Ouverture du navigateur")
-    chrome_options = Options()
-    chrome_options.executable_path = path
-    driver = webdriver.Chrome(options=chrome_options)
+    edge_options = Options()
+    edge_options.executable_path = path
+    driver = webdriver.Edge(options=edge_options)
+
+    # driver = webdriver.Chrome(options=chrome_options)
+    # setup(driver)
     setup(driver)
+
 
     # Récupérer le nombre de pages
     print("Récupération du nombre de pages")
