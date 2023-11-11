@@ -8,6 +8,98 @@ import datetime
 import time
 
 
+def
+
+
+def Sign_In(driver):
+    """
+    This function click on the sign in button
+
+    sign in HTML:
+
+    <button type="submit" class="sc-14kwckt-16 sc-16o6ckw-0 WiTvs fIpTkV sc-phxcqa-2 gGcvmy">Se connecter</button>
+    """
+    try:
+        sign_in = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, ".sc-14kwckt-16.sc-16o6ckw-0.WiTvs.fIpTkV.sc-phxcqa-2.gGcvmy"))
+        )
+        sign_in.click()
+        print("Sign in clicked")
+        time.sleep(5)
+
+    except Exception as e:
+        print("Error clicking sign in: ", e)
+        return
+
+
+def Uncheck_Remember_Me(driver):
+    """
+    This function uncheck the remember me checkbox
+
+    remember me HTML:
+
+    <input name="rememberMe" type="checkbox" class="sc-14kwckt-28 sc-1386amj-3 wwuyu bUPIKX" checked="" value="">
+    """
+    try:
+        remember_me = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.NAME, "rememberMe"))
+        )
+        remember_me.click()
+        print("Remember me unchecked")
+        time.sleep(5)
+
+    except Exception as e:
+        print("Error unchecking remember me: ", e)
+        return
+
+
+def Enter_Password(driver, password):
+    """
+    This function enter password in the input field
+
+    password HTML:
+
+    <p data-is-floating="false" class="sc-14kwckt-6 sc-166k8it-0 gNQWaV kRIHaI">Mot de passe *</p>
+
+
+    <input autocomplete="current-password" name="password" required="" type="password" class="sc-14kwckt-28 sc-ywv8p0-0 sc-166k8it-1 wwuyu jCZKki FyFvw" value="">
+    """
+    try:
+        password_field = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.NAME, "password"))
+        )
+        password_field.send_keys(password)
+        print("Password entered")
+        time.sleep(5)
+
+    except Exception as e:
+        print("Error entering password: ", e)
+        return
+
+
+def Enter_Email(driver, email):
+    """
+    This function enter email address in the input field
+
+    email HTML:
+
+    <p data-is-floating="false" class="sc-14kwckt-6 sc-166k8it-0 gNQWaV kRIHaI">Email *</p>
+
+    <input autocomplete="email" autofocus="" name="email" required="" type="email" class="sc-14kwckt-28 sc-ywv8p0-0 sc-166k8it-1 wwuyu jCZKki cQRcWN" value="">
+    """
+    try:
+        email_field = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.NAME, "email"))
+        )
+        email_field.send_keys(email)
+        print("Email entered")
+        time.sleep(5)
+
+    except Exception as e:
+        print("Error entering email: ", e)
+        return
+
+
 def accept_cookies(driver):
     """
     This function accept cookies
@@ -40,7 +132,6 @@ def open_website(driver, url):
         return
 
 
-# Function to get date of today (format: YYYYMMDD)
 def get_date_today():
     date_today = datetime.date.today()
     date_today = date_today.strftime("%Y%m%d")
@@ -67,18 +158,34 @@ if __name__ == '__main__':
 
     edge_driver = InitializedDriver()
 
-
     # Get date of today for URL
     # date_today = get_date_today()
     # url = r"https://www.lesechos.fr/liseuse/LEC?date=" + date_today
 
-    url = r"https://kiosque.lesechos.fr/"
+    url = "https://www.lesechos.fr/liseuse/LEC?date=20231110"
 
-
+    # Open website
     open_website(edge_driver, url)
 
     # Accept cookies
-    # accept_cookies(edge_driver)
+    accept_cookies(edge_driver)
+
+    # Enter email
+    email = "370ffbe9f3974bc59b2bc7cf5fece6dd5dcd84d8"
+    Enter_Email(edge_driver, email)
+
+    # Enter password
+    password = "9bab54324b7897fb040d472c363a42af018e9ccd"
+    Enter_Password(edge_driver, password)
+
+    # Uncheck remember me
+    Uncheck_Remember_Me(edge_driver)
+
+    # Sign in
+    Sign_In(edge_driver)
+
+    # Close driver
+    edge_driver.close()
 
 
 
