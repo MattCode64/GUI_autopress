@@ -8,9 +8,6 @@ import datetime
 import time
 
 
-def
-
-
 def Sign_In(driver):
     """
     This function click on the sign in button
@@ -25,7 +22,7 @@ def Sign_In(driver):
         )
         sign_in.click()
         print("Sign in clicked")
-        time.sleep(5)
+        time.sleep(10)
 
     except Exception as e:
         print("Error clicking sign in: ", e)
@@ -171,11 +168,11 @@ if __name__ == '__main__':
     accept_cookies(edge_driver)
 
     # Enter email
-    email = "370ffbe9f3974bc59b2bc7cf5fece6dd5dcd84d8"
+    email = "armand.lacombled"
     Enter_Email(edge_driver, email)
 
     # Enter password
-    password = "9bab54324b7897fb040d472c363a42af018e9ccd"
+    password = "1458"
     Enter_Password(edge_driver, password)
 
     # Uncheck remember me
