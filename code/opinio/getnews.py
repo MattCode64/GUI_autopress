@@ -17,15 +17,19 @@ from selenium.webdriver.support import expected_conditions as EC  # noqa: F401
 from selenium.webdriver.support.ui import WebDriverWait
 
 nb_fois = 0
+page = 0
 
 
 def milibris():
+    global page
+    urls_traitees = []  # Liste pour garder une trace des URLs déjà traitées
+
     html_content = edge_driver.page_source
     html_file_path = r'C:\Data\Projet CODE\Code Python\Présidence\Travail\RP AUTO PQN\data\html\page.html'
     with open(html_file_path, 'w', encoding='utf-8') as file:
         file.write(html_content)
 
-    pattern_start = b'background-image: url(&quot;https://'
+    pattern_start = b'background-image: url(&quot;'
     pattern_start_sz = len(pattern_start)
     pattern_end = b'&quot;'
     pattern_end_sz = len(pattern_end)
@@ -38,18 +42,20 @@ def milibris():
         os.makedirs(name)
 
     def getpager(url, subdir, page):
+        if url in urls_traitees:
+            print("URL déjà traitée, pas besoin de télécharger à nouveau")
+            return  # URL déjà traitée, pas besoin de télécharger à nouveau
+
         print(url)
         print(page)
-        file_name = os.path.join(subdir, f"page-{page:03}.jpeg")  # Ajout de .jpeg pour la cohérence des extensions
-        if os.path.isfile(file_name):
-            return  # Pas besoin de télécharger à nouveau
+        file_name = os.path.join(subdir, f"page-{page:03}.jpeg")
         with urllib.request.urlopen(url) as response, open(file_name, 'wb') as out_file:
             shutil.copyfileobj(response, out_file)
+        urls_traitees.append(url)  # Ajouter l'URL traitée à la liste
 
     with open(html_file_path, 'r') as f:
         mm = mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ)
         start = mm.find(pattern_start, 0)
-        page = 1
         while start != -1:
             start = start + pattern_start_sz
             end = mm.find(pattern_end, start)
@@ -71,6 +77,64 @@ def milibris():
             f.write(img2pdf.convert(image_files))
     else:
         print("Aucune image au format JPEG à convertir en PDF.")
+
+
+# def milibris():
+#     global page
+#     downloaded_pages = set()
+#
+#     html_content = edge_driver.page_source
+#     html_file_path = r'C:\Data\Projet CODE\Code Python\Présidence\Travail\RP AUTO PQN\data\html\page.html'
+#     with open(html_file_path, 'w', encoding='utf-8') as file:
+#         file.write(html_content)
+#
+#     pattern_start = b'background-image: url(&quot;https://'
+#     pattern_start_sz = len(pattern_start)
+#     pattern_end = b'&quot;'
+#     pattern_end_sz = len(pattern_end)
+#
+#     # Chemin spécifique pour stocker les images
+#     name = r"C:\Data\Projet CODE\Code Python\Présidence\Travail\RP AUTO PQN\data\images"
+#
+#     # Créer le dossier s'il n'existe pas déjà
+#     if not os.path.exists(name):
+#         os.makedirs(name)
+#
+#     def getpager(url, subdir, page):
+#         if page in downloaded_pages:
+#             return  # Si la page a déjà été téléchargée, ne rien faire
+#         print(url)
+#         print(page)
+#         file_name = os.path.join(subdir, f"page-{page:03}.jpeg")
+#         with urllib.request.urlopen(url) as response, open(file_name, 'wb') as out_file:
+#             shutil.copyfileobj(response, out_file)
+#         downloaded_pages.add(page)
+#
+#     with open(html_file_path, 'r') as f:
+#         mm = mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ)
+#         start = mm.find(pattern_start, 0)
+#         # page = 1
+#         while start != -1:
+#             start = start + pattern_start_sz
+#             end = mm.find(pattern_end, start)
+#             bytes_array = mm[start:end]
+#             url = 'https://' + str(bytes_array, 'utf-8')
+#             getpager(url, name, page)
+#             start = mm.find(pattern_start, end)
+#             page += 1
+#         mm.close()
+#
+#     # Sélection des fichiers JPEG pour la conversion en PDF
+#     image_files = [os.path.join(name, i) for i in sorted(os.listdir(name)) if i.endswith('.jpeg')]
+#
+#     pdf_file_name = "pdfjournaltest" + str(nb_fois) + ".pdf"
+#
+#     if image_files:
+#         with open(f"C:\Data\Projet CODE\Code Python\Présidence\Travail\RP AUTO PQN\data\pdf\{pdf_file_name}",
+#                   "wb") as f:
+#             f.write(img2pdf.convert(image_files))
+#     else:
+#         print("Aucune image au format JPEG à convertir en PDF.")
 
 
 def NextPages(driver):
