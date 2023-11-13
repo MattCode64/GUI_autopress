@@ -1,11 +1,63 @@
 # Importation for Selenium with Edge
 import datetime
 import time
+import os
+import sys
+import mmap
+import urllib.request
+import shutil
+import img2pdf  # python3-img2pdf
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.edge.options import Options
 from selenium.webdriver.support import expected_conditions as EC  # noqa: F401
 from selenium.webdriver.support.ui import WebDriverWait
+
+
+def milibris(html_file):
+    pattern_start = b'background-image: url(&quot;https://'
+    pattern_start_sz = len(pattern_start)
+    pattern_end = b'&quot;'
+    pattern_end_sz = len(pattern_end)
+
+    # Chemin spécifique pour stocker les images
+    name = r"C:\Data\Projet CODE\Code Python\Présidence\Travail\RP AUTO PQN\data\images"
+
+    # Créer le dossier s'il n'existe pas déjà
+    if not os.path.exists(name):
+        os.makedirs(name)
+
+    def getpage(url, subdir, page):
+        print(url)
+        print(page)
+        file_name = os.path.join(subdir, f"page-{page:03}.jpeg")  # Ajout de .jpeg pour la cohérence des extensions
+        if os.path.isfile(file_name):
+            return  # Pas besoin de télécharger à nouveau
+        with urllib.request.urlopen(url) as response, open(file_name, 'wb') as out_file:
+            shutil.copyfileobj(response, out_file)
+
+    with open(html_file, 'r') as f:
+        mm = mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ)
+        start = mm.find(pattern_start, 0)
+        page = 1
+        while start != -1:
+            start = start + pattern_start_sz
+            end = mm.find(pattern_end, start)
+            bytes_array = mm[start:end]
+            url = 'https://' + str(bytes_array, 'utf-8')
+            getpage(url, name, page)
+            start = mm.find(pattern_start, end)
+            page += 1
+        mm.close()
+
+    # Sélection des fichiers JPEG pour la conversion en PDF
+    image_files = [os.path.join(name, i) for i in sorted(os.listdir(name)) if i.endswith('.jpeg')]
+
+    if image_files:
+        with open(f"{name}.pdf", "wb") as f:
+            f.write(img2pdf.convert(image_files))
+    else:
+        print("Aucune image au format JPEG à convertir en PDF.")
 
 
 def GetCredentials(file_path, site_name):
@@ -19,8 +71,6 @@ def GetCredentials(file_path, site_name):
     return None, None
 
 
-
-# Function to get the html of where we are after signing in
 def GetHtml(driver):
     """
     This function saves the html of the current page to a file
@@ -47,11 +97,12 @@ def Sign_In(driver):
     """
     try:
         sign_in = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, ".sc-14kwckt-16.sc-16o6ckw-0.WiTvs.fIpTkV.sc-phxcqa-2.gGcvmy"))
+            EC.presence_of_element_located(
+                (By.CSS_SELECTOR, ".sc-14kwckt-16.sc-16o6ckw-0.WiTvs.fIpTkV.sc-phxcqa-2.gGcvmy"))
         )
         sign_in.click()
         print("Sign in clicked")
-        time.sleep(10)
+        time.sleep(5)
 
     except Exception as e:
         print("Error clicking sign in: ", e)
@@ -72,7 +123,7 @@ def Uncheck_Remember_Me(driver):
         )
         remember_me.click()
         print("Remember me unchecked")
-        time.sleep(2)
+        time.sleep(0.5)
 
     except Exception as e:
         print("Error unchecking remember me: ", e)
@@ -92,13 +143,12 @@ def Enter_Password(driver, password):
     """
     try:
 
-
         password_field = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.NAME, "password"))
         )
         password_field.send_keys(password)
         print("Password entered")
-        time.sleep(2)
+        time.sleep(0.5)
 
     except Exception as e:
         print("Error entering password: ", e)
@@ -200,7 +250,7 @@ if __name__ == '__main__':
     accept_cookies(edge_driver)
 
     # Get login
-    email, password = GetCredentials(login_file, 'lopinion')
+    email, password = GetCredentials(login_file, 'lesechos')
 
     # Enter email
     Enter_Email(edge_driver, email)
@@ -212,14 +262,16 @@ if __name__ == '__main__':
     Uncheck_Remember_Me(edge_driver)
 
     # Sign in
-    # Sign_In(edge_driver)
+    Sign_In(edge_driver)
 
-    # Get HTML
-    # GetHtml(edge_driver)
+    html_content = edge_driver.page_source
+    html_file_path = r'C:\Data\Projet CODE\Code Python\Présidence\Travail\RP AUTO PQN\datahtml_content.html'
+    with open(html_file_path, 'w', encoding='utf-8') as file:
+        file.write(html_content)
+
+
+    # Call milibris with the saved HTML file path
+    milibris(html_file_path)
 
     # Close driver
     edge_driver.close()
-
-
-
-
