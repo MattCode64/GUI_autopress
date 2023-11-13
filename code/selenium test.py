@@ -106,7 +106,6 @@ def setup(driver):
         return
 
 
-
 def convert_to_pdf(image_path, page_number, pdfmerger, split=False):
     try:
         image = Image.open(image_path)
@@ -219,7 +218,6 @@ if __name__ == '__main__':
     # driver = webdriver.Chrome(options=chrome_options)
     # setup(driver)
     setup(driver)
-
 
     # Récupérer le nombre de pages
     print("Récupération du nombre de pages")
