@@ -7,14 +7,24 @@ import mmap
 import urllib.request
 import shutil
 import img2pdf  # python3-img2pdf
+from httpcore import TimeoutException
 from selenium import webdriver
+from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.edge.options import Options
+from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support import expected_conditions as EC  # noqa: F401
 from selenium.webdriver.support.ui import WebDriverWait
 
+nb_fois = 0
 
-def milibris(html_file):
+
+def milibris():
+    html_content = edge_driver.page_source
+    html_file_path = r'C:\Data\Projet CODE\Code Python\Présidence\Travail\RP AUTO PQN\data\html\page.html'
+    with open(html_file_path, 'w', encoding='utf-8') as file:
+        file.write(html_content)
+
     pattern_start = b'background-image: url(&quot;https://'
     pattern_start_sz = len(pattern_start)
     pattern_end = b'&quot;'
@@ -27,7 +37,7 @@ def milibris(html_file):
     if not os.path.exists(name):
         os.makedirs(name)
 
-    def getpage(url, subdir, page):
+    def getpager(url, subdir, page):
         print(url)
         print(page)
         file_name = os.path.join(subdir, f"page-{page:03}.jpeg")  # Ajout de .jpeg pour la cohérence des extensions
@@ -36,7 +46,7 @@ def milibris(html_file):
         with urllib.request.urlopen(url) as response, open(file_name, 'wb') as out_file:
             shutil.copyfileobj(response, out_file)
 
-    with open(html_file, 'r') as f:
+    with open(html_file_path, 'r') as f:
         mm = mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ)
         start = mm.find(pattern_start, 0)
         page = 1
@@ -45,7 +55,7 @@ def milibris(html_file):
             end = mm.find(pattern_end, start)
             bytes_array = mm[start:end]
             url = 'https://' + str(bytes_array, 'utf-8')
-            getpage(url, name, page)
+            getpager(url, name, page)
             start = mm.find(pattern_start, end)
             page += 1
         mm.close()
@@ -53,11 +63,40 @@ def milibris(html_file):
     # Sélection des fichiers JPEG pour la conversion en PDF
     image_files = [os.path.join(name, i) for i in sorted(os.listdir(name)) if i.endswith('.jpeg')]
 
+    pdf_file_name = "pdfjournaltest" + str(nb_fois) + ".pdf"
+
     if image_files:
-        with open(f"{name}.pdf", "wb") as f:
+        with open(f"C:\Data\Projet CODE\Code Python\Présidence\Travail\RP AUTO PQN\data\pdf\{pdf_file_name}",
+                  "wb") as f:
             f.write(img2pdf.convert(image_files))
     else:
         print("Aucune image au format JPEG à convertir en PDF.")
+
+
+def NextPages(driver):
+    """
+    This function click on the next page button until the last page
+
+    next page HTML (where to click):
+    //*[@id="app"]/main/div
+
+
+    :param driver:
+    :return:
+    """
+    try:
+        next_page = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located(
+                (By.XPATH, "/html/body/div[3]/main/div/div[2]/div[2]/div[3]"))
+        )
+        next_page.click()
+        print("Next page clicked")
+        time.sleep(4)
+        return True  # Continue à cliquer
+
+    except Exception as e:
+        print("Error clicking next page or end of pages: ", e)
+        return False  # Fin des pages ou erreur
 
 
 def GetCredentials(file_path, site_name):
@@ -221,8 +260,8 @@ def InitializedDriver():
     try:
         options = Options()
         options.use_chromium = True
-        options.add_argument("maximized")
         driver = webdriver.Edge(options=options)
+        driver.maximize_window()
         print("Driver Initialized")
         return driver
 
@@ -264,14 +303,16 @@ if __name__ == '__main__':
     # Sign in
     Sign_In(edge_driver)
 
-    html_content = edge_driver.page_source
-    html_file_path = r'C:\Data\Projet CODE\Code Python\Présidence\Travail\RP AUTO PQN\datahtml_content.html'
-    with open(html_file_path, 'w', encoding='utf-8') as file:
-        file.write(html_content)
+    click_count = 0
+    while True:
+        if click_count % 3 == 0:  # Exécute milibris tous les 3 clics
+            milibris()
 
+        if not NextPages(edge_driver):
+            milibris()  # Exécute milibris une dernière fois après le dernier clic
+            break
 
-    # Call milibris with the saved HTML file path
-    milibris(html_file_path)
+        click_count += 1
 
     # Close driver
     edge_driver.close()
