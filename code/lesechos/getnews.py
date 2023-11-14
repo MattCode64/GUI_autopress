@@ -1,18 +1,15 @@
 # Importation for Selenium with Edge
 import datetime
-import time
-import os
-import sys
 import mmap
-import urllib.request
+import os
 import shutil
+import time
+import urllib.request
+
 import img2pdf  # python3-img2pdf
-from httpcore import TimeoutException
 from selenium import webdriver
-from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.edge.options import Options
-from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support import expected_conditions as EC  # noqa: F401
 from selenium.webdriver.support.ui import WebDriverWait
 
@@ -28,7 +25,6 @@ def multi_click(driver, page, urls_traitees):
             break
 
         click_count += 1
-
 
 
 def create_directory(path):
@@ -48,7 +44,7 @@ def getpager(url, subdir, page, urls_traitees):
         with urllib.request.urlopen(url) as response, open(file_name, 'wb') as out_file:
             shutil.copyfileobj(response, out_file)
         urls_traitees.add(url)  # Ajouter l'URL traitée au set
-    except urllib.error.URLError as e:
+    except Exception as e:
         print(f"Erreur lors de l'ouverture de l'URL {url}: {e}")
 
 
@@ -164,7 +160,7 @@ def GetHtml(driver):
 
 def Sign_In(driver):
     """
-    This function click on the sign in button
+    This function click on the sign-in button
 
     sign in HTML:
 
@@ -203,6 +199,14 @@ def Uncheck_Remember_Me(driver):
     except Exception as e:
         print("Error unchecking remember me: ", e)
         return
+
+
+def Login(driver, email, password):
+    # Enter email
+    Enter_Email(driver, email)
+
+    # Enter password
+    Enter_Password(driver, password)
 
 
 def Enter_Password(driver, password):
@@ -253,7 +257,7 @@ def Enter_Email(driver, email):
         return
 
 
-def accept_cookies(driver):
+def AcceptCookies(driver):
     """
     This function accept cookies
 
@@ -318,22 +322,19 @@ if __name__ == '__main__':
     URL = "https://www.lesechos.fr/liseuse/LEC"
     login_file = r"C:\Data\Projet CODE\Code Python\Présidence\Travail\RP AUTO PQN\data\login.txt"
     page = 0
-    urls_traitees = set()
+    urls_done = set()
 
     # Open website
     open_website(edge_driver, URL)
 
     # Accept cookies
-    accept_cookies(edge_driver)
+    AcceptCookies(edge_driver)
 
     # Get login
     email, password = GetCredentials(login_file, 'lesechos')
 
-    # Enter email
-    Enter_Email(edge_driver, email)
-
-    # Enter password
-    Enter_Password(edge_driver, password)
+    # Login
+    Login(edge_driver, email, password)
 
     # Uncheck remember me
     Uncheck_Remember_Me(edge_driver)
@@ -342,7 +343,9 @@ if __name__ == '__main__':
     Sign_In(edge_driver)
 
     # Click
-    multi_click(edge_driver, page, urls_traitees)
+    multi_click(edge_driver, page, urls_done)
 
     # Close driver
     edge_driver.close()
+
+    print("End of the program")
