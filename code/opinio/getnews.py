@@ -1,18 +1,16 @@
 # Importation for Selenium with Edge
 import datetime
-import time
-import os
-import sys
+import json
 import mmap
-import urllib.request
+import os
 import shutil
+import time
+import urllib.request
+
 import img2pdf  # python3-img2pdf
-from httpcore import TimeoutException
 from selenium import webdriver
-from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.edge.options import Options
-from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support import expected_conditions as EC  # noqa: F401
 from selenium.webdriver.support.ui import WebDriverWait
 
@@ -21,10 +19,13 @@ def multi_click(driver, page, urls_traitees):
     click_count = 0
     while True:
         if click_count % 3 == 0:  # Exécute milibris tous les 3 clics
-            milibris(driver, page, urls_traitees)
+            page = milibris(driver, page, urls_traitees, config=r"C:\Data\Projet CODE\Code Python\Présidence\Travail\RP AUTO PQN\data\config\config.json")
 
         if not NextPages(edge_driver):
-            milibris(driver, page, urls_traitees)  # Exécute milibris une dernière fois après le dernier clic
+            page = milibris(driver, page, urls_traitees, config=r"C:\Data\Projet CODE\Code Python\Présidence\Travail\RP AUTO PQN\data\config\config.json")  # Exécute milibris une dernière fois après le dernier clic
+            print("Fin des pages ou erreur")
+            print("Nombre de clics: ", click_count)
+            print("Nombre de pages: ", page)
             break
 
         click_count += 1
@@ -48,7 +49,7 @@ def getpager(url, subdir, page, urls_traitees):
         with urllib.request.urlopen(url) as response, open(file_name, 'wb') as out_file:
             shutil.copyfileobj(response, out_file)
         urls_traitees.add(url)  # Ajouter l'URL traitée au set
-    except urllib.error.URLError as e:
+    except Exception as e:
         print(f"Erreur lors de l'ouverture de l'URL {url}: {e}")
 
 
@@ -65,7 +66,7 @@ def extract_image_urls(html_file_path):
             start = start + pattern_start_sz
             end = mm.find(pattern_end, start)
             bytes_array = mm[start:end]
-            url = 'https://' + str(bytes_array, 'utf-8')
+            url = str(bytes_array, 'utf-8')
             image_urls.append(url)
             start = mm.find(pattern_start, end)
         mm.close()
@@ -76,11 +77,13 @@ def download_images(image_urls, image_dir, page, urls_traitees):
     for url in image_urls:
         getpager(url, image_dir, page, urls_traitees)
         page += 1
+    return page
 
 
 def read_html_and_download_images(html_file_path, image_dir, page, urls_traitees):
     image_urls = extract_image_urls(html_file_path)
-    download_images(image_urls, image_dir, page, urls_traitees)
+    page = download_images(image_urls, image_dir, page, urls_traitees)
+    return page
 
 
 def convert_images_to_pdf(image_dir, pdf_dir, pdf_file_name):
@@ -92,21 +95,26 @@ def convert_images_to_pdf(image_dir, pdf_dir, pdf_file_name):
         print("Aucune image au format JPEG à convertir en PDF.")
 
 
-def milibris(driver, page, urls_traitees):
-    html_content = driver.page_source
-    html_file_path = r'C:\Data\Projet CODE\Code Python\Présidence\Travail\RP AUTO PQN\data\html\page.html'
-    with open(html_file_path, 'w', encoding='utf-8') as file:
-        file.write(html_content)
+def milibris(driver, page, urls_traitees, config):
+    with open(config, 'r', encoding='utf-8') as config_file:
+        config = json.load(config_file)
 
-    image_dir = r"C:\Data\Projet CODE\Code Python\Présidence\Travail\RP AUTO PQN\data\images"
-    pdf_dir = r"C:\Data\Projet CODE\Code Python\Présidence\Travail\RP AUTO PQN\data\pdf"
+    html_file_path = config["directories"]["html_file_path"]
+    html_file_path = GetHtml(driver, html_file_path)
+    image_dir = config["directories"]["image_dir"]
+    pdf_dir = config["directories"]["pdf_dir"]
+
+    # image_dir = r"C:\Data\Projet CODE\Code Python\Présidence\Travail\RP AUTO PQN\data\images"
+    # pdf_dir = r"C:\Data\Projet CODE\Code Python\Présidence\Travail\RP AUTO PQN\data\pdf"
     create_directory(image_dir)
     create_directory(pdf_dir)
 
-    read_html_and_download_images(html_file_path, image_dir, page, urls_traitees)
+    page = read_html_and_download_images(html_file_path, image_dir, page, urls_traitees)
 
     pdf_file_name = "pdfjournaltest.pdf"
     convert_images_to_pdf(image_dir, pdf_dir, pdf_file_name)
+
+    return page
 
 
 def NextPages(driver):
@@ -146,20 +154,44 @@ def GetCredentials(file_path, site_name):
     return None, None
 
 
-def GetHtml(driver):
+def GetHtml(driver, html_file_path):
     """
-    This function saves the html of the current page to a file
+    This function saves the html of the current page to the file path specified in config.json
     """
-    try:
-        html = driver.page_source
-        print("HTML gotten")
+    print(type(html_file_path))
+    # Étape 3: Écrire le contenu HTML dans le fichier spécifié
+    html_content = driver.page_source
+    print("HTML gotten")
+    with open(html_file_path, 'w', encoding='utf-8') as file:
+        print("File opened and writing in it")
+        file.write(html_content)
+    print("File written")
+    time.sleep(0.5)
+    return html_file_path
+    # try:
+    #
+    #
+    # except Exception as e:
+    #     print("Error getting HTML: ", e)
 
-        with open('page.html', 'w', encoding='utf-8') as file:
-            file.write(html)
-        print("File written")
 
-    except Exception as e:
-        print("Error getting HTML: ", e)
+# def GetHtml(driver):
+#     """
+#     This function saves the html of the current page to a file
+#     """
+#     try:
+#         html_content = driver.page_source
+#         print("HTML gotten")
+#         html_file_path = "C:\\Data\\Projet CODE\\Code Python\\Présidence\\Travail\\RP AUTO PQN\\data\\html\\page.html"
+#         with open(html_file_path, 'w', encoding='utf-8') as file:
+#             print("File opened and writing in it")
+#             file.write(html_content)
+#         print("File written")
+#         time.sleep(0.5)
+#         return html_file_path
+#
+#     except Exception as e:
+#         print("Error getting HTML: ", e)
 
 
 def Sign_In(driver):
