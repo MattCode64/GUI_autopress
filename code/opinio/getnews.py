@@ -16,125 +16,97 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support import expected_conditions as EC  # noqa: F401
 from selenium.webdriver.support.ui import WebDriverWait
 
-nb_fois = 0
-page = 0
+
+def multi_click(driver, page, urls_traitees):
+    click_count = 0
+    while True:
+        if click_count % 3 == 0:  # Exécute milibris tous les 3 clics
+            milibris(driver, page, urls_traitees)
+
+        if not NextPages(edge_driver):
+            milibris(driver, page, urls_traitees)  # Exécute milibris une dernière fois après le dernier clic
+            break
+
+        click_count += 1
 
 
-def milibris():
-    global page
-    urls_traitees = []  # Liste pour garder une trace des URLs déjà traitées
 
-    html_content = edge_driver.page_source
-    html_file_path = r'C:\Data\Projet CODE\Code Python\Présidence\Travail\RP AUTO PQN\data\html\page.html'
-    with open(html_file_path, 'w', encoding='utf-8') as file:
-        file.write(html_content)
+def create_directory(path):
+    if not os.path.exists(path):
+        os.makedirs(path)
 
-    pattern_start = b'background-image: url(&quot;'
-    pattern_start_sz = len(pattern_start)
-    pattern_end = b'&quot;'
-    pattern_end_sz = len(pattern_end)
 
-    # Chemin spécifique pour stocker les images
-    name = r"C:\Data\Projet CODE\Code Python\Présidence\Travail\RP AUTO PQN\data\images"
+def getpager(url, subdir, page, urls_traitees):
+    if url in urls_traitees:
+        print("URL déjà traitée, pas besoin de télécharger à nouveau")
+        return
 
-    # Créer le dossier s'il n'existe pas déjà
-    if not os.path.exists(name):
-        os.makedirs(name)
-
-    def getpager(url, subdir, page):
-        if url in urls_traitees:
-            print("URL déjà traitée, pas besoin de télécharger à nouveau")
-            return  # URL déjà traitée, pas besoin de télécharger à nouveau
-
-        print(url)
-        print(page)
-        file_name = os.path.join(subdir, f"page-{page:03}.jpeg")
+    print(url)
+    print(page)
+    file_name = os.path.join(subdir, f"page-{page:03}.jpeg")
+    try:
         with urllib.request.urlopen(url) as response, open(file_name, 'wb') as out_file:
             shutil.copyfileobj(response, out_file)
-        urls_traitees.append(url)  # Ajouter l'URL traitée à la liste
+        urls_traitees.add(url)  # Ajouter l'URL traitée au set
+    except urllib.error.URLError as e:
+        print(f"Erreur lors de l'ouverture de l'URL {url}: {e}")
 
+
+def extract_image_urls(html_file_path):
+    image_urls = []
     with open(html_file_path, 'r') as f:
         mm = mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ)
+        pattern_start = b'background-image: url(&quot;'
+        pattern_start_sz = len(pattern_start)
+        pattern_end = b'&quot;'
+
         start = mm.find(pattern_start, 0)
         while start != -1:
             start = start + pattern_start_sz
             end = mm.find(pattern_end, start)
             bytes_array = mm[start:end]
             url = 'https://' + str(bytes_array, 'utf-8')
-            getpager(url, name, page)
+            image_urls.append(url)
             start = mm.find(pattern_start, end)
-            page += 1
         mm.close()
+    return image_urls
 
-    # Sélection des fichiers JPEG pour la conversion en PDF
-    image_files = [os.path.join(name, i) for i in sorted(os.listdir(name)) if i.endswith('.jpeg')]
 
-    pdf_file_name = "pdfjournaltest" + str(nb_fois) + ".pdf"
+def download_images(image_urls, image_dir, page, urls_traitees):
+    for url in image_urls:
+        getpager(url, image_dir, page, urls_traitees)
+        page += 1
 
+
+def read_html_and_download_images(html_file_path, image_dir, page, urls_traitees):
+    image_urls = extract_image_urls(html_file_path)
+    download_images(image_urls, image_dir, page, urls_traitees)
+
+
+def convert_images_to_pdf(image_dir, pdf_dir, pdf_file_name):
+    image_files = [os.path.join(image_dir, i) for i in sorted(os.listdir(image_dir)) if i.endswith('.jpeg')]
     if image_files:
-        with open(f"C:\Data\Projet CODE\Code Python\Présidence\Travail\RP AUTO PQN\data\pdf\{pdf_file_name}",
-                  "wb") as f:
+        with open(os.path.join(pdf_dir, pdf_file_name), "wb") as f:
             f.write(img2pdf.convert(image_files))
     else:
         print("Aucune image au format JPEG à convertir en PDF.")
 
 
-# def milibris():
-#     global page
-#     downloaded_pages = set()
-#
-#     html_content = edge_driver.page_source
-#     html_file_path = r'C:\Data\Projet CODE\Code Python\Présidence\Travail\RP AUTO PQN\data\html\page.html'
-#     with open(html_file_path, 'w', encoding='utf-8') as file:
-#         file.write(html_content)
-#
-#     pattern_start = b'background-image: url(&quot;https://'
-#     pattern_start_sz = len(pattern_start)
-#     pattern_end = b'&quot;'
-#     pattern_end_sz = len(pattern_end)
-#
-#     # Chemin spécifique pour stocker les images
-#     name = r"C:\Data\Projet CODE\Code Python\Présidence\Travail\RP AUTO PQN\data\images"
-#
-#     # Créer le dossier s'il n'existe pas déjà
-#     if not os.path.exists(name):
-#         os.makedirs(name)
-#
-#     def getpager(url, subdir, page):
-#         if page in downloaded_pages:
-#             return  # Si la page a déjà été téléchargée, ne rien faire
-#         print(url)
-#         print(page)
-#         file_name = os.path.join(subdir, f"page-{page:03}.jpeg")
-#         with urllib.request.urlopen(url) as response, open(file_name, 'wb') as out_file:
-#             shutil.copyfileobj(response, out_file)
-#         downloaded_pages.add(page)
-#
-#     with open(html_file_path, 'r') as f:
-#         mm = mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ)
-#         start = mm.find(pattern_start, 0)
-#         # page = 1
-#         while start != -1:
-#             start = start + pattern_start_sz
-#             end = mm.find(pattern_end, start)
-#             bytes_array = mm[start:end]
-#             url = 'https://' + str(bytes_array, 'utf-8')
-#             getpager(url, name, page)
-#             start = mm.find(pattern_start, end)
-#             page += 1
-#         mm.close()
-#
-#     # Sélection des fichiers JPEG pour la conversion en PDF
-#     image_files = [os.path.join(name, i) for i in sorted(os.listdir(name)) if i.endswith('.jpeg')]
-#
-#     pdf_file_name = "pdfjournaltest" + str(nb_fois) + ".pdf"
-#
-#     if image_files:
-#         with open(f"C:\Data\Projet CODE\Code Python\Présidence\Travail\RP AUTO PQN\data\pdf\{pdf_file_name}",
-#                   "wb") as f:
-#             f.write(img2pdf.convert(image_files))
-#     else:
-#         print("Aucune image au format JPEG à convertir en PDF.")
+def milibris(driver, page, urls_traitees):
+    html_content = driver.page_source
+    html_file_path = r'C:\Data\Projet CODE\Code Python\Présidence\Travail\RP AUTO PQN\data\html\page.html'
+    with open(html_file_path, 'w', encoding='utf-8') as file:
+        file.write(html_content)
+
+    image_dir = r"C:\Data\Projet CODE\Code Python\Présidence\Travail\RP AUTO PQN\data\images"
+    pdf_dir = r"C:\Data\Projet CODE\Code Python\Présidence\Travail\RP AUTO PQN\data\pdf"
+    create_directory(image_dir)
+    create_directory(pdf_dir)
+
+    read_html_and_download_images(html_file_path, image_dir, page, urls_traitees)
+
+    pdf_file_name = "pdfjournaltest.pdf"
+    convert_images_to_pdf(image_dir, pdf_dir, pdf_file_name)
 
 
 def NextPages(driver):
@@ -345,6 +317,8 @@ if __name__ == '__main__':
 
     URL = "https://www.lesechos.fr/liseuse/LEC"
     login_file = r"C:\Data\Projet CODE\Code Python\Présidence\Travail\RP AUTO PQN\data\login.txt"
+    page = 0
+    urls_traitees = set()
 
     # Open website
     open_website(edge_driver, URL)
@@ -367,16 +341,8 @@ if __name__ == '__main__':
     # Sign in
     Sign_In(edge_driver)
 
-    click_count = 0
-    while True:
-        if click_count % 3 == 0:  # Exécute milibris tous les 3 clics
-            milibris()
-
-        if not NextPages(edge_driver):
-            milibris()  # Exécute milibris une dernière fois après le dernier clic
-            break
-
-        click_count += 1
+    # Click
+    multi_click(edge_driver, page, urls_traitees)
 
     # Close driver
     edge_driver.close()
