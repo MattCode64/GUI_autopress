@@ -15,7 +15,7 @@ import urllib.request
 import shutil
 import img2pdf  # python3-img2pdf
 
-pattern_start = b'background-image: url(&quot;//'
+pattern_start = b'background_path-image: url(&quot;//'
 pattern_start_sz = len(pattern_start)
 pattern_end = b'&quot;'
 pattern_end_sz = len(pattern_end)
