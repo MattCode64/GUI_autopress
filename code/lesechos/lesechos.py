@@ -4,9 +4,9 @@ import mmap
 import os
 import shutil
 import time
+from PIL import Image
 import urllib.request
-
-import img2pdf  # python3-img2pdf
+import json
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.edge.options import Options
@@ -14,17 +14,92 @@ from selenium.webdriver.support import expected_conditions as EC  # noqa: F401
 from selenium.webdriver.support.ui import WebDriverWait
 
 
-def multi_click(driver, page, urls_traitees):
+def delete_images(config_file):
+    with open(config_file, 'r', encoding='utf-8') as config_file:
+        config = json.load(config_file)
+
+    image_dir = config["directories"]["image_dir"]
+
+    for filename in os.listdir(image_dir):
+        if filename.endswith('.jpeg'):
+            os.remove(os.path.join(image_dir, filename))
+
+
+def convert_images_to_pdf(config, pdf_file_name):
+    with open(config, 'r', encoding='utf-8') as config_info:
+        print("Getting directories...")
+        config = json.load(config_info)
+
+    image_dir = config["directories"]["image_dir"]
+    pdf_dir = config["directories"]["pdf_dir"]
+
+    delete_unwanted_images(image_dir)
+    assembled_images = assemble_images(image_dir)
+
+    if assembled_images:
+        pdf_path = os.path.join(pdf_dir, pdf_file_name)
+        assembled_images[0].save(pdf_path, "PDF", save_all=True, append_images=assembled_images[1:])
+    else:
+        print("Aucune image à convertir en PDF.")
+
+
+def assemble_images(image_dir):
+    image_files = sorted([os.path.join(image_dir, f) for f in os.listdir(image_dir) if f.endswith('.jpeg')])
+    assembled_images = []
+
+    for i in range(0, len(image_files), 6):
+        images_to_assemble = image_files[i:i + 6]
+        if len(images_to_assemble) < 6:
+            break
+
+        images = [Image.open(img) for img in images_to_assemble]
+        widths, heights = zip(*(i.size for i in images))
+
+        new_im = Image.new('RGB', (1372, 2048))
+
+        y_offset = 0
+        for j, im in enumerate(images):
+            if j == 3:  # Start of the right column
+                y_offset = 0
+            x_offset = 0 if j < 3 else max(widths)
+            new_im.paste(im, (x_offset, y_offset))
+            y_offset += im.size[1]
+
+        assembled_images.append(new_im)
+
+    return assembled_images
+
+
+def delete_unwanted_images(image_dir):
+    for filename in os.listdir(image_dir):
+        if filename.endswith('.jpeg'):
+            page_number = int(filename.split('-')[1].split('.')[0])
+            if page_number % 7 == 0:
+                os.remove(os.path.join(image_dir, filename))
+
+
+def multi_click(driver, page, urls_traitees, config, pdf_file_name):
+    print("Starting pages processing")
     click_count = 0
     while True:
         if click_count % 3 == 0:  # Exécute milibris tous les 3 clics
-            milibris(driver, page, urls_traitees)
+            page = MilibrisFunction(driver, page, urls_traitees, config)
 
         if not NextPages(edge_driver):
-            milibris(driver, page, urls_traitees)  # Exécute milibris une dernière fois après le dernier clic
+            page = MilibrisFunction(driver, page, urls_traitees,
+                                    config)  # Exécute milibris une dernière fois après le dernier clic
+            print("Fin des pages ou erreur")
+            print("Nombre de pages: ", click_count * 2)
+            print("Nombre de d'images: ", page)
             break
 
         click_count += 1
+
+    # Convert images to PDF
+    print("Starting conversion to PDF")
+    convert_images_to_pdf(config_file, pdf_file_name)
+    print("Conversion to PDF done")
+    delete_images(config_file)
 
 
 def create_directory(path):
@@ -61,7 +136,7 @@ def extract_image_urls(html_file_path):
             start = start + pattern_start_sz
             end = mm.find(pattern_end, start)
             bytes_array = mm[start:end]
-            url = 'https://' + str(bytes_array, 'utf-8')
+            url = str(bytes_array, 'utf-8')
             image_urls.append(url)
             start = mm.find(pattern_start, end)
         mm.close()
@@ -72,37 +147,29 @@ def download_images(image_urls, image_dir, page, urls_traitees):
     for url in image_urls:
         getpager(url, image_dir, page, urls_traitees)
         page += 1
+    return page
 
 
 def read_html_and_download_images(html_file_path, image_dir, page, urls_traitees):
     image_urls = extract_image_urls(html_file_path)
-    download_images(image_urls, image_dir, page, urls_traitees)
+    page = download_images(image_urls, image_dir, page, urls_traitees)
+    return page
 
 
-def convert_images_to_pdf(image_dir, pdf_dir, pdf_file_name):
-    image_files = [os.path.join(image_dir, i) for i in sorted(os.listdir(image_dir)) if i.endswith('.jpeg')]
-    if image_files:
-        with open(os.path.join(pdf_dir, pdf_file_name), "wb") as f:
-            f.write(img2pdf.convert(image_files))
-    else:
-        print("Aucune image au format JPEG à convertir en PDF.")
+def MilibrisFunction(driver, page, urls_traitees, config):
+    with open(config, 'r', encoding='utf-8') as config_file:
+        config = json.load(config_file)
 
+    html_file_path = config["directories"]["html_file_path"]
+    html_file_path = GetHtml(driver, html_file_path)
+    image_dir = config["directories"]["image_dir"]
+    pdf_dir = config["directories"]["pdf_dir"]
 
-def milibris(driver, page, urls_traitees):
-    html_content = driver.page_source
-    html_file_path = r'C:\Data\Projet CODE\Code Python\Présidence\Travail\RP AUTO PQN\data\html\page.html'
-    with open(html_file_path, 'w', encoding='utf-8') as file:
-        file.write(html_content)
-
-    image_dir = r"C:\Data\Projet CODE\Code Python\Présidence\Travail\RP AUTO PQN\data\images"
-    pdf_dir = r"C:\Data\Projet CODE\Code Python\Présidence\Travail\RP AUTO PQN\data\pdf"
     create_directory(image_dir)
     create_directory(pdf_dir)
 
-    read_html_and_download_images(html_file_path, image_dir, page, urls_traitees)
-
-    pdf_file_name = "pdfjournaltest.pdf"
-    convert_images_to_pdf(image_dir, pdf_dir, pdf_file_name)
+    page = read_html_and_download_images(html_file_path, image_dir, page, urls_traitees)
+    return page
 
 
 def NextPages(driver):
@@ -125,40 +192,42 @@ def NextPages(driver):
         print("Next page clicked")
         time.sleep(4)
         return True  # Continue à cliquer
-
     except Exception as e:
-        print("Error clicking next page or end of pages: ", e)
+        print("Error clicking next page or end of pages !")
         return False  # Fin des pages ou erreur
 
 
-def GetCredentials(file_path, site_name):
-    with open(file_path, 'r') as file:
-        lines = file.readlines()
-        for i, line in enumerate(lines):
-            if site_name in line and 'email' in line:
-                email = line.split(': ')[1].strip()
-                password = lines[i + 1].split(': ')[1].strip()
-                return email, password
-    return None, None
-
-
-def GetHtml(driver):
-    """
-    This function saves the html of the current page to a file
-    """
+def GetCredentials(site_name, login_config):
     try:
-        html = driver.page_source
-        print("HTML gotten")
+        with open(login_config, 'r', encoding='utf-8') as login_file:
+            print("Getting credentials...")
+            config = json.load(login_file)
 
-        with open('page.html', 'w', encoding='utf-8') as file:
-            file.write(html)
-        print("File written")
-
+        email = str(config["credentials"][site_name]["email"])
+        password = str(config["credentials"][site_name]["password"])
+        print("Credentials gotten")
+        return email, password
     except Exception as e:
-        print("Error getting HTML: ", e)
+        print("Error getting credentials: ", e)
+        return None, None
 
 
-def Sign_In(driver):
+def GetHtml(driver, html_file_path):
+    """
+    This function saves the html of the current page to the file path specified in config.json
+    """
+    # Étape 3: Écrire le contenu HTML dans le fichier spécifié
+    html_content = driver.page_source
+    print("HTML gotten")
+    with open(html_file_path, 'w', encoding='utf-8') as file:
+        print("File opened and writing in it")
+        file.write(html_content)
+    print("File written")
+    time.sleep(0.5)
+    return html_file_path
+
+
+def SignIn(driver):
     """
     This function click on the sign-in button
 
@@ -173,6 +242,7 @@ def Sign_In(driver):
         )
         sign_in.click()
         print("Sign in clicked")
+        print("Opening newspaper...")
         time.sleep(5)
 
     except Exception as e:
@@ -218,7 +288,8 @@ def Enter_Password(driver, password):
     <p data-is-floating="false" class="sc-14kwckt-6 sc-166k8it-0 gNQWaV kRIHaI">Mot de passe *</p>
 
 
-    <input autocomplete="current-password" name="password" required="" type="password" class="sc-14kwckt-28 sc-ywv8p0-0 sc-166k8it-1 wwuyu jCZKki FyFvw" value="">
+    <input autocomplete="current-password" name="password" required="" type="password" class="sc-14kwckt-28
+    sc-ywv8p0-0 sc-166k8it-1 wwuyu jCZKki FyFvw" value="">
     """
     try:
 
@@ -242,7 +313,8 @@ def Enter_Email(driver, email):
 
     <p data-is-floating="false" class="sc-14kwckt-6 sc-166k8it-0 gNQWaV kRIHaI">Email *</p>
 
-    <input autocomplete="email" autofocus="" name="email" required="" type="email" class="sc-14kwckt-28 sc-ywv8p0-0 sc-166k8it-1 wwuyu jCZKki cQRcWN" value="">
+    <input autocomplete="email" autofocus="" name="email" required="" type="email" class="sc-14kwckt-28 sc-ywv8p0-0
+    sc-166k8it-1 wwuyu jCZKki cQRcWN" value="">
     """
     try:
         email_field = WebDriverWait(driver, 10).until(
@@ -263,7 +335,11 @@ def AcceptCookies(driver):
 
     cookies HTML:
 
-    <button id="didomi-notice-agree-button" class="didomi-components-button didomi-button didomi-dismiss-button didomi-components-button--color didomi-button-highlight highlight-button" aria-label="Accepter &amp; Fermer: Accepter notre traitement des données et fermer" style="color: rgb(255, 255, 255); background-color: rgb(215, 29, 23); border-radius: 20px; border-color: rgba(33, 33, 33, 0.3); border-width: 0px; display: block !important;"><span>Accepter</span></button>
+    <button id="didomi-notice-agree-button" class="didomi-components-button didomi-button didomi-dismiss-button
+    didomi-components-button--color didomi-button-highlight highlight-button" aria-label="Accepter &amp; Fermer:
+    Accepter notre traitement des données et fermer" style="color: rgb(255, 255, 255); background-color: rgb(215, 29,
+    23); border-radius: 20px; border-color: rgba(33, 33, 33, 0.3); border-width: 0px; display: block
+    !important;"><span>Accepter</span></button>
     """
     try:
         cookies = WebDriverWait(driver, 10).until(
@@ -310,28 +386,50 @@ def InitializedDriver():
         return
 
 
+def GetURL(config_file, site_name):
+    """
+    This function get the URL from the config file
+
+    "url": {
+        "lopinion": "https://www.lopinion.fr/",
+        "lesechos": "https://www.lesechos.fr/liseuse/LEC"
+    },
+
+    :param config_file:
+    :param site_name:
+    :return url:
+    """
+    try:
+        with open(config_file, 'r', encoding='utf-8') as config_file:
+            config = json.load(config_file)
+
+        url = str(config["url"][site_name])
+        print("URL gotten:", url)
+        return url
+    except Exception as e:
+        print("Error getting URL: ", e)
+        return None
+
+
 if __name__ == '__main__':
     print("Start of the program")
 
     edge_driver = InitializedDriver()
 
-    # Get date of today for URL
-    # date_today = get_date_today()
-    # url = r"https://www.lesechos.fr/liseuse/LEC?date=" + date_today
-
-    URL = "https://www.lesechos.fr/liseuse/LEC"
-    login_file = r"C:\Data\Projet CODE\Code Python\Présidence\Travail\RP AUTO PQN\data\login.txt"
+    config_file = r"C:\Data\Projet CODE\Code Python\Présidence\Travail\RP AUTO PQN\data\config\config.json"
+    pdf_file_name = "JournalLesEchos" + get_date_today() + ".pdf"
     page = 0
     urls_done = set()
 
     # Open website
+    URL = GetURL(config_file, "lesechos")
     open_website(edge_driver, URL)
 
     # Accept cookies
     AcceptCookies(edge_driver)
 
     # Get login
-    email, password = GetCredentials(login_file, 'lesechos')
+    email, password = GetCredentials('lesechos', config_file)
 
     # Login
     Login(edge_driver, email, password)
@@ -340,10 +438,10 @@ if __name__ == '__main__':
     Uncheck_Remember_Me(edge_driver)
 
     # Sign in
-    Sign_In(edge_driver)
+    SignIn(edge_driver)
 
-    # Click
-    multi_click(edge_driver, page, urls_done)
+    # Processing pages
+    multi_click(edge_driver, page, urls_done, config_file, pdf_file_name)
 
     # Close driver
     edge_driver.close()
