@@ -1,32 +1,55 @@
 from opinion import *
 
 
-def GetShadowRoot(driver, xpathSequence):
+def GetShadowRoot(driver):
+    shadow_root = driver.find_element(By.CSS_SELECTOR, "body > epaper-application > div > view-publication").shadow_root
+    print("First shadow root gotten")
+    inner_shadow = shadow_root.find_element(By.CSS_SELECTOR, "div > book-cover > book-navigation").shadow_root
+    print("Second shadow root gotten")
+    inner_inner_shadow = inner_shadow.find_element(By.CSS_SELECTOR, "nav > read-mode").shadow_root
+    print("Third shadow root gotten")
+
     """
-    Get the shadow root of the element
-
-    :param driver:
-    :param xpathSequence:
-    :return:
+    CSS_SELECTOR of read mode button:
+    #read-mode > button
     """
-    try:
-        current_element = driver
-        for number, xpath in enumerate(xpathSequence):
-            print("Getting shadow root number ", number)
-            print("Current element: ", current_element)
-            print("Xpath: ", xpath)
-            shadow_host = WebDriverWait(current_element, 10).until(
-                EC.presence_of_element_located((By.XPATH, xpath))
-            )
-            current_element = driver.execute_script("return arguments[0].shadowRoot", shadow_host)
-            print("Shadow root gotten")
 
-        print("Final shadow root gotten")
-        return current_element
+    time.sleep(5)
+    read_mode_button = inner_inner_shadow.find_element(By.CSS_SELECTOR, "#read-mode > button > span")
+    print("Read mode button gotten")
+    time.sleep(5)
+    read_mode_button.click()
+    print("Read mode activated")
+    time.sleep(5)
 
-    except Exception as e:
-        print("Error while getting shadow root: ", e)
-        return None
+    # text = inner_inner_shadow.find_element(By.CSS_SELECTOR, "#read-mode > button > span").text
+    # print("Text gotten: ", text)
+
+    # """
+    # Get the shadow root of the element
+    #
+    # :param driver:
+    # :param xpathSequence:
+    # :return:
+    # """
+    # try:
+    #     current_element = driver
+    #     for number, xpath in enumerate(xpathSequence):
+    #         print("Getting shadow root number ", number)
+    #         print("Current element: ", current_element)
+    #         print("Xpath: ", xpath)
+    #         shadow_host = WebDriverWait(current_element, 10).until(
+    #             EC.presence_of_element_located((By.XPATH, xpath))
+    #         )
+    #         current_element = driver.execute_script("return arguments[0].shadowRoot", shadow_host)
+    #         print("Shadow root gotten")
+    #
+    #     print("Final shadow root gotten")
+    #     return current_element
+    #
+    # except Exception as e:
+    #     print("Error while getting shadow root: ", e)
+    #     return None
 
 
 def ReadMode(driver):
@@ -78,7 +101,7 @@ if __name__ == '__main__':
     SignIn(edge_driver, config, "lopinion")
 
     # Getting in shadow root
-    shadow_root = GetShadowRoot(edge_driver, xpath_sequence)
+    GetShadowRoot(edge_driver)
 
     # Read Mode
     # ReadMode(edge_driver)
