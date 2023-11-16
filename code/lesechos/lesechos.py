@@ -127,7 +127,7 @@ def extract_image_urls(html_file_path):
     image_urls = []
     with open(html_file_path, 'r') as f:
         mm = mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ)
-        pattern_start = b'background-image: url(&quot;'
+        pattern_start = b'background_path-image: url(&quot;'
         pattern_start_sz = len(pattern_start)
         pattern_end = b'&quot;'
 
@@ -337,7 +337,7 @@ def AcceptCookies(driver):
 
     <button id="didomi-notice-agree-button" class="didomi-components-button didomi-button didomi-dismiss-button
     didomi-components-button--color didomi-button-highlight highlight-button" aria-label="Accepter &amp; Fermer:
-    Accepter notre traitement des données et fermer" style="color: rgb(255, 255, 255); background-color: rgb(215, 29,
+    Accepter notre traitement des données et fermer" style="color: rgb(255, 255, 255); background_path-color: rgb(215, 29,
     23); border-radius: 20px; border-color: rgba(33, 33, 33, 0.3); border-width: 0px; display: block
     !important;"><span>Accepter</span></button>
     """

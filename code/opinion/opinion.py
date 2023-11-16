@@ -1,13 +1,27 @@
 # Import for Selenium and Edge
 import json
 import time
-
 from selenium import webdriver
 from selenium.webdriver.edge.options import Options
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
+
+# def ScreenShot(driver):
+#     """
+#     Take a screenshot of the website
+#
+#     :param driver:
+#     :return:
+#     """
+#     try:
+#         driver.save_screenshot("screenshot.png")
+#         print("Screenshot taken")
+#
+#     except Exception as e:
+#         print("Error while taking screenshot: ", e)
+#         return
 
 
 def KeepMeSignedIn(driver):
@@ -22,7 +36,8 @@ def KeepMeSignedIn(driver):
     """
     try:
         keepMeSignedIn = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.XPATH, "/html/body/app-main/app-widget/screen-layout/main/current-screen/div/screen-login/p[5]/span[1]/label/remember-me/checkbox/checkbox-control"))
+            EC.presence_of_element_located((By.XPATH,
+                                            "/html/body/app-main/app-widget/screen-layout/main/current-screen/div/screen-login/p[5]/span[1]/label/remember-me/checkbox/checkbox-control"))
         )
         keepMeSignedIn.click()
         print("Keep me signed in unchecked")
@@ -213,7 +228,7 @@ def GetURL(configfile, websitename):
         with open(configfile, "r") as f:
             configJson = json.load(f)
 
-        print("URL of " + websitename + " gotten : ")
+        print("URL of " + websitename + " gotten")
         return str(configJson["url"][websitename])
 
     except Exception as e:
@@ -240,12 +255,30 @@ def OpenWebsite(driver, config_file, website_name):
         return
 
 
+def QuitDriver(driver):
+    """
+    Quit the driver
+
+    :param driver:
+    :return:
+    """
+    try:
+        driver.quit()
+        print("Driver quitted")
+
+    except Exception as e:
+        print("Error while quitting driver: ", e)
+        return
+
+
 def SetupDriver():
     try:
         options = Options()
+        options.add_argument("window-size=1920,1080")
+        # options.headless = True
         options.use_chromium = True
+        # options.add_argument("window-size=1920,1080")
         driver = webdriver.Edge(options=options)
-        driver.maximize_window()
         print("Driver Initialized")
         return driver
 
@@ -274,6 +307,11 @@ if __name__ == '__main__':
     # Sign In
     SignIn(edge_driver, config, "lopinion")
 
+    time.sleep(3000)
+
+    # Take Screenshot
+    # ScreenShot(edge_driver)
+
     # Close Driver
-    edge_driver.close()
+    QuitDriver(edge_driver)
     print("End of program")
