@@ -5,13 +5,36 @@ from PIL import Image
 import os
 import glob
 
-if __name__ == '__main__':
-    path = r"C:\Data\Projet CODE\Code Python\Présidence\Travail\RP AUTO PQN\data\images\1.png"
+# Create a function that converts png to pdf and add it to the pdf
+def ConvertPngToPdf(path, pdf):
+    """
+    Function to convert png to pdf and add it to the pdf
 
-    # Convert png to pdf
-    image1 = Image.open(path)
-    im1 = image1.convert('RGB')
-    im1.save(r"C:\Data\Projet CODE\Code Python\Présidence\Travail\RP AUTO PQN\data\images\1.pdf")
+    :param path:
+    :param pdf:
+    :return:
+    """
+    try:
+        # Create a list of png files
+        png_files = glob.glob(path + "/*.png")
 
-    # Delete png
-    os.remove(path)
+        # Sort the list
+        png_files.sort()
+
+        # Loop through the list
+        for png_file in png_files:
+            # Open the png file
+            png = Image.open(png_file)
+
+            # Convert png to pdf
+            pdf.append(png)
+
+            # Close the png file
+            png.close()
+
+        # Return the pdf
+        return pdf
+
+    except Exception as e:
+        print("Error while converting png to pdf: ", e)
+        return

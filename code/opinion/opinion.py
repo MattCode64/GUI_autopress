@@ -267,8 +267,7 @@ def QuitDriver(driver):
 def SetupDriver():
     try:
         options = Options()
-        options.add_argument("window-size=1620,2880")
-        # options.headless = True
+        options.add_argument("--window-size=1620,2880")
         options.use_chromium = True
         driver = webdriver.Edge(options=options)
         print("Driver Initialized")
@@ -277,33 +276,3 @@ def SetupDriver():
     except Exception as e:
         print("Error while setup webdriver: ", e)
         return
-
-
-# if __name__ == '__main__':
-#     print("Start of program")
-#
-#     config = r"C:\Data\Projet CODE\Code Python\Présidence\Travail\RP AUTO PQN\data\config\config.json"
-#
-#     # Setup Driver
-#     edge_driver = SetupDriver()
-#
-#     # Open Website
-#     OpenWebsite(edge_driver, config, "lopinion")
-#
-#     # Accept Cookies
-#     AcceptCookies(edge_driver)
-#
-#     # Switch to iframe
-#     SwitchIframe(edge_driver)
-#
-#     # Sign In
-#     SignIn(edge_driver, config, "lopinion")
-#
-#     time.sleep(3000)
-#
-#     # Take Screenshot
-#     # ScreenShot(edge_driver)
-#
-#     # Close Driver
-#     QuitDriver(edge_driver)
-#     print("End of program")
