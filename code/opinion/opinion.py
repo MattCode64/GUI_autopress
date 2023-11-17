@@ -8,6 +8,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
+
 # def ScreenShot(driver):
 #     """
 #     Take a screenshot of the website
@@ -263,8 +264,15 @@ def QuitDriver(driver):
     :return:
     """
     try:
-        driver.quit()
-        print("Driver quitted")
+        # If driver is driver type, quit
+        if isinstance(driver, webdriver.Edge):
+            driver.quit()
+            print("Driver quit")
+
+        # Else, return
+        else:
+            print("Driver is not webdriver.Edge type, maybe shadow root.")
+            return
 
     except Exception as e:
         print("Error while quitting driver: ", e)
@@ -287,31 +295,31 @@ def SetupDriver():
         return
 
 
-if __name__ == '__main__':
-    print("Start of program")
-
-    config = r"C:\Data\Projet CODE\Code Python\Présidence\Travail\RP AUTO PQN\data\config\config.json"
-
-    # Setup Driver
-    edge_driver = SetupDriver()
-
-    # Open Website
-    OpenWebsite(edge_driver, config, "lopinion")
-
-    # Accept Cookies
-    AcceptCookies(edge_driver)
-
-    # Switch to iframe
-    SwitchIframe(edge_driver)
-
-    # Sign In
-    SignIn(edge_driver, config, "lopinion")
-
-    time.sleep(3000)
-
-    # Take Screenshot
-    # ScreenShot(edge_driver)
-
-    # Close Driver
-    QuitDriver(edge_driver)
-    print("End of program")
+# if __name__ == '__main__':
+#     print("Start of program")
+#
+#     config = r"C:\Data\Projet CODE\Code Python\Présidence\Travail\RP AUTO PQN\data\config\config.json"
+#
+#     # Setup Driver
+#     edge_driver = SetupDriver()
+#
+#     # Open Website
+#     OpenWebsite(edge_driver, config, "lopinion")
+#
+#     # Accept Cookies
+#     AcceptCookies(edge_driver)
+#
+#     # Switch to iframe
+#     SwitchIframe(edge_driver)
+#
+#     # Sign In
+#     SignIn(edge_driver, config, "lopinion")
+#
+#     time.sleep(3000)
+#
+#     # Take Screenshot
+#     # ScreenShot(edge_driver)
+#
+#     # Close Driver
+#     QuitDriver(edge_driver)
+#     print("End of program")
