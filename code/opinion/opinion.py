@@ -9,22 +9,6 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
 
-# def ScreenShot(driver):
-#     """
-#     Take a screenshot of the website
-#
-#     :param driver:
-#     :return:
-#     """
-#     try:
-#         driver.save_screenshot("screenshot.png")
-#         print("Screenshot taken")
-#
-#     except Exception as e:
-#         print("Error while taking screenshot: ", e)
-#         return
-
-
 def KeepMeSignedIn(driver):
     """
     Uncheck the keep me signed in checkbox
@@ -70,6 +54,7 @@ def SignIn(driver, configfile, websitename):
                                                       "-screen/div/screen-login/p[6]/button"))
         )
         signInButton.click()
+        time.sleep(5)
         print("Signed in")
 
     except Exception as e:
@@ -282,10 +267,9 @@ def QuitDriver(driver):
 def SetupDriver():
     try:
         options = Options()
-        options.add_argument("window-size=1920,1080")
+        options.add_argument("window-size=1620,2880")
         # options.headless = True
         options.use_chromium = True
-        # options.add_argument("window-size=1920,1080")
         driver = webdriver.Edge(options=options)
         print("Driver Initialized")
         return driver

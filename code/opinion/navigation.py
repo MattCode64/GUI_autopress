@@ -1,17 +1,62 @@
+import time
+
 from opinion import *
 
 
-def ReadMode(driver):
+def SaveElement(driver):
     """
-    Function to activate read mode
+    Function to get in shadow root and take screenshot
 
-    CSS Selector: #read-mode > button > span
+    Element is in first shadow root
+
+    CSS Selector of element:
+    div > book-cover > book-page:nth-child(2) > div.page_location.zoomed > svg
+
 
     :param driver:
     :return:
     """
     try:
-        read_mode_button = WebDriverWait(driver, 10).until(
+        # Get shadow root
+        shadow_root = GetShadowRoot(driver, ["body > epaper-application > div > view-publication"])
+        # Take
+        # time.sleep(533333)
+        element = WebDriverWait(shadow_root, 10).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, "div > book-cover > book-page:nth-child(2) > div.page_location > svg"))
+        )
+
+        # Save element entirely without screenshot
+        element.screenshot(r"C:\Data\Projet CODE\Code Python\Présidence\Travail\RP AUTO PQN\data\images\1.png")
+
+        # Print the size of the element
+        print("Element size: ", element.size)
+        print("Screenshot taken")
+
+    except Exception as e:
+        print("Error while taking screenshot: ", e)
+        return
+
+
+def ReadMode(driver, config_file, value):
+    """
+    Function to activate read mode
+
+    CSS Selector: #read-mode > button > span
+
+    :param config_file:
+    :param value:
+    :param driver:
+    :return:
+    """
+    try:
+        with open(config_file, "r") as f:
+            configJson = json.load(f)
+
+        shadow_path = configJson[value].values()
+
+        shadow_driver = GetShadowRoot(driver, shadow_path)
+
+        read_mode_button = WebDriverWait(shadow_driver, 10).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, "#read-mode > button > span"))
         )
         print("Read mode button gotten")
@@ -21,13 +66,6 @@ def ReadMode(driver):
     except Exception as e:
         print("Error while activating read mode: ", e)
         return
-
-    # read_mode_button = driver.find_element(By.CSS_SELECTOR, "#read-mode > button > span")
-    # print("Read mode button gotten")
-    # time.sleep(5)
-    # read_mode_button.click()
-    # print("Read mode activated")
-    # time.sleep(5)
 
 
 def GetShadowRoot(driver, shadow_path):
@@ -41,34 +79,21 @@ def GetShadowRoot(driver, shadow_path):
     try:
         for i, sequence in enumerate(shadow_path):
             print("Getting shadow root number " + str(i + 1))
-            time.sleep(0.5)
+            time.sleep(2)
             driver = driver.find_element(By.CSS_SELECTOR, sequence).shadow_root
             print("Shadow root number " + str(i + 1) + " gotten")
 
         print("Final shadow root gotten")
-        # time.sleep(5)
+        time.sleep(2)
         return driver
 
     except Exception as e:
         print("Error while getting shadow root: ", e)
         return
 
-    # shadow_root = driver.find_element(By.CSS_SELECTOR, "body > epaper-application > div >
-    # view-publication").shadow_root print("First shadow root gotten") inner_shadow = shadow_root.find_element(
-    # By.CSS_SELECTOR, "div > book-cover > book-navigation").shadow_root print("Second shadow root gotten")
-    # inner_inner_shadow = inner_shadow.find_element(By.CSS_SELECTOR, "nav > read-mode").shadow_root print("Third
-    # shadow root gotten")
-    #
-
 
 if __name__ == '__main__':
     print("Start of program")
-    shadow_sequences = [
-        "body > epaper-application > div > view-publication",
-        "div > book-cover > book-navigation",
-        "nav > read-mode"
-    ]
-
     config = r"C:\Data\Projet CODE\Code Python\Présidence\Travail\RP AUTO PQN\data\config\config.json"
 
     # Setup Driver
@@ -86,11 +111,16 @@ if __name__ == '__main__':
     # Sign In
     SignIn(edge_driver, config, "lopinion")
 
-    # Getting in shadow root
-    edge_driver = GetShadowRoot(edge_driver, shadow_sequences)
-
     # Read Mode
-    ReadMode(edge_driver)
+    # ReadMode(edge_driver, config, "shadow_root")
+    time.sleep(20)
+
+    # Screenshot Element
+    SaveElement(edge_driver)
+
+    # # Scroll Pixels
+    # ScrollPixels(shadow_driver, 500)
+    # ScrollPixels(edge_driver, 500)
 
     # Quit Driver
     QuitDriver(edge_driver)
