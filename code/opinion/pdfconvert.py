@@ -16,7 +16,7 @@ def Conversion(config_file):
         ConvertImagesToPdf(config_file)
 
         # Delete images
-        # DeleteImages(config_file)
+        DeleteImages(config_file)
 
     except Exception as e:
         print("Error while converting images to pdf: ", e)
