@@ -1,10 +1,8 @@
-# Import for Selenium and Edge
 import json
 import time
 from selenium import webdriver
-from selenium.webdriver.edge.options import Options
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
+from selenium.webdriver.edge.options import Options
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
@@ -267,7 +265,8 @@ def QuitDriver(driver):
 def SetupDriver():
     try:
         options = Options()
-        options.add_argument("--window-size=1620,2880")
+        # Option for 9:16 Ratio
+        options.add_argument("--window-size=1080,1920")
         options.use_chromium = True
         driver = webdriver.Edge(options=options)
         print("Driver Initialized")

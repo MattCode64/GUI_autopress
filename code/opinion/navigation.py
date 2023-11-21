@@ -1,4 +1,56 @@
-from opinion import *
+import json
+import time
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
+
+
+def Screenshots(driver, config_file, page):
+    """
+    Function to take screenshot of all pages
+
+    CSS Selector of element:
+    div > book-cover > book-page:nth-child([ITERATE UNTIL MAX PAGE]) > div.page_location > svg
+
+    :param page:
+    :param driver:
+    :param config_file:
+    :return:
+    """
+    try:
+        with open(config_file, "r", encoding='utf-8') as f:
+            configJson = json.load(f)
+
+        # First value of the dictionary
+        shadow_path = list(configJson["shadow_root"].values())[0]
+
+        # Call function to get shadow root
+        shadow_root = GetShadowRoot(driver, shadow_path)
+
+        # Take screenshot of the element
+        print(page)
+        css_selector = "div > book-cover > book-page:nth-child({}) > div.page_location > svg".format(page + 1)
+        print("\nCSS Selector: ", css_selector)
+        element = WebDriverWait(shadow_root, 10).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, css_selector)))
+
+        # Open with config file to get the path of the folder
+        with open(config_file, "r", encoding='utf-8') as f:
+            configJson = json.load(f)
+
+        # Get the path of the folder
+        path = configJson["directories"]["image_dirOPI"]
+        print("Path of the folder: ", path)
+
+        # Save the element as a png file
+        path = path + "\\{}.png".format(page)
+        element.screenshot(path)
+        print("~~~ Screenshot of page {} taken ~~~".format(page))
+        print("Saved in {}".format(path))
+
+    except Exception as e:
+        print("Error while taking screenshot: ", e)
+        return
 
 
 def Processing(driver, config_file):
@@ -9,21 +61,21 @@ def Processing(driver, config_file):
     :param config_file:
     :return:
     """
-    try:
-        page = 1
-        while True:
-            # Take screenshot
-            SaveElement(driver, config_file, page)
+    # Get number of pages
+    number_of_pages = GetNumberOfPages(driver, config_file)
+    print("Number of pages: ", number_of_pages)
 
-            # Change page
-            ChangePage(driver, config_file)
+    # Convert number_of_pages to int
+    number_of_pages = int(number_of_pages)
 
-            # Increment page
-            page += 1
+    # Iterate through all pages
+    for page in range(1, number_of_pages + 1):
+        print("Page number: ", page)
+        Screenshots(driver, config_file, page)
+        ChangePage(driver, config_file)
+        print("Page changed")
 
-    except Exception as e:
-        print("Error while processing or no more pages: ", e)
-        return
+    print("End of processing")
 
 
 def GetNumberOfPages(driver, config_file):
@@ -53,6 +105,7 @@ def GetNumberOfPages(driver, config_file):
         )
         print("Number of pages gotten")
         print("Number of pages: ", number_of_pages.text)
+        # Convert number_of_pages to int
         return number_of_pages.text
 
     except Exception as e:
@@ -85,77 +138,20 @@ def ChangePage(driver, config_file):
             EC.presence_of_element_located((By.CSS_SELECTOR, "nav > button:nth-child(11)"))
         )
         change_page.click()
-        time.sleep(5)
+        time.sleep(2)
 
     except Exception as e:
-        print("Error while changing page: ", e)
+        print("Error while changing page or no more pages: ", e)
         return
 
 
-def SaveElement(driver, config_file, page):
-    """
-    Function to get in shadow root and take screenshot
-
-    Element is in first shadow root
-
-    CSS Selector of element:
-    div > book-cover > book-page:nth-child(2) > div.page_location.zoomed > svg
-
-
-    :param page:
-    :param config_file:
-    :param driver:
-    :return:
-    """
-    with open(config_file, "r") as f:
-        configJson = json.load(f)
-
-    # First value of the dictionary
-    shadow_path = list(configJson["shadow_root"].values())[0]
-
-    # Get shadow root
-    shadow_root = GetShadowRoot(driver, shadow_path)
-
-    element = WebDriverWait(shadow_root, 10).until(
-        EC.presence_of_element_located(
-            (By.CSS_SELECTOR, "div > book-cover > book-page:nth-child(2) > div.page_location > svg"))
-    )
-
-    path = r"C:\Data\Projet CODE\Code Python\Présidence\Travail\RP AUTO PQN\data\images\{}.png".format(page)
-    element.screenshot(path)
-    print("Screenshot of page {} taken".format(page))
-    # try:
-    #     with open(config_file, "r") as f:
-    #         configJson = json.load(f)
-    #
-    #     # First value of the dictionary
-    #     shadow_path = list(configJson["shadow_root"].values())[0]
-    #     print(shadow_path)
-    #
-    #     # Get shadow root
-    #     shadow_root = GetShadowRoot(driver, shadow_path)
-    #
-    #     element = WebDriverWait(shadow_root, 10).until(
-    #         EC.presence_of_element_located((By.CSS_SELECTOR, "div > book-cover > book-page:nth-child(2) > div.page_location > svg"))
-    #     )
-    #
-    #     element.screenshot(r"C:\Data\Projet CODE\Code Python\Présidence\Travail\RP AUTO PQN\data\images\1.png")
-    #
-    #     print("Screenshot taken")
-    #
-    # except Exception as e:
-    #     print("Error while taking screenshot: ", e)
-    #     return
-
-
-def ReadMode(driver, config_file, value):
+def ReadMode(driver, config_file):
     """
     Function to activate read mode
 
     CSS Selector: #read-mode > button > span
 
     :param config_file:
-    :param value:
     :param driver:
     :return:
     """
@@ -163,7 +159,7 @@ def ReadMode(driver, config_file, value):
         with open(config_file, "r") as f:
             configJson = json.load(f)
 
-        shadow_path = configJson[value].values()
+        shadow_path = list(configJson["shadow_root"].values())
         print(type(shadow_path))
         print(shadow_path)
 
@@ -194,7 +190,7 @@ def GetShadowRoot(driver, shadow_path):
         if type(shadow_path) is list:
             for i, sequence in enumerate(shadow_path):
                 print("Getting shadow root number " + str(i + 1))
-                time.sleep(2)
+                time.sleep(0.2)
                 driver = driver.find_element(By.CSS_SELECTOR, sequence).shadow_root
                 print("Shadow root number " + str(i + 1) + " gotten")
 
@@ -203,34 +199,9 @@ def GetShadowRoot(driver, shadow_path):
             print("Shadow root gotten")
 
         print("Final shadow root gotten")
-        time.sleep(2)
+        time.sleep(0.2)
         return driver
 
     except Exception as e:
         print("Error while getting shadow root: ", e)
         return
-
-
-if __name__ == '__main__':
-    print("Start of program")
-    config = r"C:\Data\Projet CODE\Code Python\Présidence\Travail\RP AUTO PQN\data\config\config.json"
-
-    # Setup Driver
-    edge_driver = SetupDriver()
-
-    # Open Website
-    OpenWebsite(edge_driver, config, "lopinion")
-
-    # Accept Cookies
-    AcceptCookies(edge_driver)
-
-    # Switch to iframe
-    SwitchIframe(edge_driver)
-
-    # Sign In
-    SignIn(edge_driver, config, "lopinion")
-
-    Processing(edge_driver, config)
-
-    QuitDriver(edge_driver)
-    print("End of program")

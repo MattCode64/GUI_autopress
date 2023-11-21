@@ -1,40 +1,91 @@
-from navigation import *
-from opinion import *
-# Import libraries to convert png to pdf
-from PIL import Image
 import os
-import glob
+import json
+import datetime
+import img2pdf
 
-# Create a function that converts png to pdf and add it to the pdf
-def ConvertPngToPdf(path, pdf):
+
+def Conversion(config_file):
     """
-    Function to convert png to pdf and add it to the pdf
+    Function to convert images to pdf and delete images
 
-    :param path:
-    :param pdf:
+    :param config_file:
     :return:
     """
     try:
-        # Create a list of png files
-        png_files = glob.glob(path + "/*.png")
+        # Convert images to pdf
+        ConvertImagesToPdf(config_file)
 
-        # Sort the list
-        png_files.sort()
-
-        # Loop through the list
-        for png_file in png_files:
-            # Open the png file
-            png = Image.open(png_file)
-
-            # Convert png to pdf
-            pdf.append(png)
-
-            # Close the png file
-            png.close()
-
-        # Return the pdf
-        return pdf
+        # Delete images
+        # DeleteImages(config_file)
 
     except Exception as e:
-        print("Error while converting png to pdf: ", e)
+        print("Error while converting images to pdf: ", e)
         return
+
+
+def DeleteImages(config_file):
+    """
+    Delete all the images in the folder
+
+    :param config_file:
+    :return:
+    """
+    try:
+        # Open JSON file for "image_dirOPI"
+        with open(config_file, "r", encoding='utf-8') as f:
+            configJson = json.load(f)
+
+        # Get the path of the folder
+        path = configJson["directories"]["image_dirOPI"]
+
+        # Get every path of the images in the folder
+        images = [os.path.join(path, fn) for fn in os.listdir(path)]
+
+        # Delete all the images
+        for image in images:
+            os.remove(image)
+
+        print("Images deleted")
+
+    except Exception as e:
+        print("Error while deleting images: ", e)
+        return
+
+
+def ConvertImagesToPdf(config_file):
+    """
+    Convert images to pdf
+
+    :param config_file:
+    :return:
+    """
+    try:
+        # GET DD/MM/YYYY of today
+        today = datetime.date.today()
+        today = today.strftime("%d%m%Y")  # Format changed for file naming
+
+        # Open JSON file for "image_dirOPI"
+        with open(config_file, "r", encoding='utf-8') as f:
+            configJson = json.load(f)
+
+        # Get the path of the folder
+        path = configJson["directories"]["image_dirOPI"]
+
+        # Get the path of the output file will be saved
+        output_path = configJson["directories"]["pdf_dir"]
+        output_file = os.path.join(output_path, f"JournalOPINION{today}.pdf")  # Nom de fichier PDF basé sur la date
+
+        # Get every path of the images in the folder
+        images = [os.path.join(path, fn) for fn in os.listdir(path) if fn.endswith('.png')]  # Filtrer pour les images
+
+        if images:
+            print(images)
+
+            # Convert images to pdf
+            with open(output_file, "wb") as f:
+                f.write(img2pdf.convert(images))
+
+            print("PDF created at", output_file)
+
+    except Exception as e:
+        print("An error occurred:", e)

@@ -18,7 +18,7 @@ def delete_images(config_file):
     with open(config_file, 'r', encoding='utf-8') as config_file:
         config = json.load(config_file)
 
-    image_dir = config["directories"]["image_dir"]
+    image_dir = config["directories"]["image_dirLE"]
 
     for filename in os.listdir(image_dir):
         if filename.endswith('.jpeg'):
@@ -30,7 +30,7 @@ def convert_images_to_pdf(config, pdf_file_name):
         print("Getting directories...")
         config = json.load(config_info)
 
-    image_dir = config["directories"]["image_dir"]
+    image_dir = config["directories"]["image_dirLE"]
     pdf_dir = config["directories"]["pdf_dir"]
 
     delete_unwanted_images(image_dir)
@@ -90,12 +90,12 @@ def multi_click(driver, page, urls_traitees, config, pdf_file_name):
                                     config)  # Exécute milibris une dernière fois après le dernier clic
             print("Fin des pages ou erreur")
             print("Nombre de pages: ", click_count * 2)
-            print("Nombre de d'images: ", page)
+            print("Nombre de d'imagesLE: ", page)
             break
 
         click_count += 1
 
-    # Convert images to PDF
+    # Convert imagesLE to PDF
     print("Starting conversion to PDF")
     convert_images_to_pdf(config_file, pdf_file_name)
     print("Conversion to PDF done")
@@ -127,7 +127,7 @@ def extract_image_urls(html_file_path):
     image_urls = []
     with open(html_file_path, 'r') as f:
         mm = mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ)
-        pattern_start = b'background_path-image: url(&quot;'
+        pattern_start = b'background-image: url(&quot;'
         pattern_start_sz = len(pattern_start)
         pattern_end = b'&quot;'
 
@@ -162,7 +162,7 @@ def MilibrisFunction(driver, page, urls_traitees, config):
 
     html_file_path = config["directories"]["html_file_path"]
     html_file_path = GetHtml(driver, html_file_path)
-    image_dir = config["directories"]["image_dir"]
+    image_dir = config["directories"]["image_dirLE"]
     pdf_dir = config["directories"]["pdf_dir"]
 
     create_directory(image_dir)
