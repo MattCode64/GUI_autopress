@@ -8,7 +8,7 @@ def main():
     config = r"C:\Data\Projet CODE\Code Python\Présidence\Travail\RP AUTO PQN\data\config\config.json"
 
     # Setup Driver
-    edge_driver = SetupDriver()
+    edge_driver = SetupDriver('chrome')
 
     # Open Website
     OpenWebsite(edge_driver, config, "lopinion")

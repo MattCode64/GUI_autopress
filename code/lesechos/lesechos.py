@@ -1,15 +1,17 @@
 # Importation for Selenium with Edge
 import datetime
+import json
 import mmap
 import os
 import shutil
 import time
-from PIL import Image
 import urllib.request
-import json
+from PIL import Image
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.common.by import By
-from selenium.webdriver.edge.options import Options
+from selenium.webdriver.edge.options import Options as EdgeOptions
+from selenium.webdriver.firefox.options import Options as FirefoxOptions
 from selenium.webdriver.support import expected_conditions as EC  # noqa: F401
 from selenium.webdriver.support.ui import WebDriverWait
 
@@ -85,7 +87,7 @@ def multi_click(driver, page, urls_traitees, config, pdf_file_name):
         if click_count % 3 == 0:  # Exécute milibris tous les 3 clics
             page = MilibrisFunction(driver, page, urls_traitees, config)
 
-        if not NextPages(edge_driver):
+        if not NextPages(webDriver):
             page = MilibrisFunction(driver, page, urls_traitees,
                                     config)  # Exécute milibris une dernière fois après le dernier clic
             print("Fin des pages ou erreur")
@@ -371,12 +373,22 @@ def get_date_today():
     return date_today
 
 
-def InitializedDriver():
+def InitializedDriver(browser_name):
     # Try and except to handle error
     try:
-        options = Options()
-        options.use_chromium = True
-        driver = webdriver.Edge(options=options)
+        if browser_name.lower() == 'chrome':
+            options = ChromeOptions()
+            driver = webdriver.Chrome(options=options)
+        elif browser_name.lower() == 'firefox':
+            options = FirefoxOptions()
+            driver = webdriver.Firefox(options=options)
+        elif browser_name.lower() == 'edge':
+            options = EdgeOptions()
+            options.use_chromium = True
+            driver = webdriver.Edge(options=options)
+        else:
+            raise ValueError("Unsupported browser")
+
         driver.maximize_window()
         print("Driver Initialized")
         return driver
@@ -414,7 +426,7 @@ def GetURL(config_file, site_name):
 if __name__ == '__main__':
     print("Start of the program")
 
-    edge_driver = InitializedDriver()
+    webDriver = InitializedDriver('firefox')
 
     config_file = r"C:\Data\Projet CODE\Code Python\Présidence\Travail\RP AUTO PQN\data\config\config.json"
     pdf_file_name = "JournalLesEchos" + get_date_today() + ".pdf"
@@ -423,27 +435,27 @@ if __name__ == '__main__':
 
     # Open website
     URL = GetURL(config_file, "lesechos")
-    open_website(edge_driver, URL)
+    open_website(webDriver, URL)
 
     # Accept cookies
-    AcceptCookies(edge_driver)
+    AcceptCookies(webDriver)
 
     # Get login
     email, password = GetCredentials('lesechos', config_file)
 
     # Login
-    Login(edge_driver, email, password)
+    Login(webDriver, email, password)
 
     # Uncheck remember me
-    Uncheck_Remember_Me(edge_driver)
+    Uncheck_Remember_Me(webDriver)
 
     # Sign in
-    SignIn(edge_driver)
+    SignIn(webDriver)
 
     # Processing pages
-    multi_click(edge_driver, page, urls_done, config_file, pdf_file_name)
+    multi_click(webDriver, page, urls_done, config_file, pdf_file_name)
 
     # Close driver
-    edge_driver.close()
+    webDriver.close()
 
     print("End of the program")

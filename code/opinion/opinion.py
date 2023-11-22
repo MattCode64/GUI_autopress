@@ -2,7 +2,9 @@ import json
 import time
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.edge.options import Options
+from selenium.webdriver.chrome.options import Options as ChromeOptions
+from selenium.webdriver.firefox.options import Options as FirefoxOptions
+from selenium.webdriver.edge.options import Options as EdgeOptions
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
@@ -262,13 +264,24 @@ def QuitDriver(driver):
         return
 
 
-def SetupDriver():
+def SetupDriver(browser_name):
     try:
-        options = Options()
-        # Option for 9:16 Ratio
-        options.add_argument("--window-size=1080,1920")
-        options.use_chromium = True
-        driver = webdriver.Edge(options=options)
+        if browser_name.lower() == 'chrome':
+            options = ChromeOptions()
+            options.add_argument("--window-size=1080,1920")
+            driver = webdriver.Chrome(options=options)
+        elif browser_name.lower() == 'firefox':
+            options = FirefoxOptions()
+            options.add_argument("--window-size=1080,1920")
+            driver = webdriver.Firefox(options=options)
+        elif browser_name.lower() == 'edge':
+            options = EdgeOptions()
+            options.use_chromium = True
+            options.add_argument("--window-size=1080,1920")
+            driver = webdriver.Edge(options=options)
+        else:
+            raise ValueError("Unsupported browser")
+
         print("Driver Initialized")
         return driver
 
