@@ -426,9 +426,9 @@ def GetURL(config_file, site_name):
 if __name__ == '__main__':
     print("Start of the program")
 
-    webDriver = InitializedDriver('firefox')
+    webDriver = InitializedDriver('chrome')
 
-    config_file = r"C:\Data\Projet CODE\Code Python\Présidence\Travail\RP AUTO PQN\data\config\config.json"
+    config_file = "../../data/config/config.json"
     pdf_file_name = "JournalLesEchos" + get_date_today() + ".pdf"
     page = 0
     urls_done = set()

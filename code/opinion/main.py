@@ -5,7 +5,7 @@ from pdfconvert import *
 
 def main():
     print("Start of program")
-    config = r"C:\Data\Projet CODE\Code Python\Présidence\Travail\RP AUTO PQN\data\config\config.json"
+    config = "../../data/config/config.json"
 
     # Setup Driver
     edge_driver = SetupDriver('chrome')
