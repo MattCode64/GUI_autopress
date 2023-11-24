@@ -1,4 +1,3 @@
-import selenium
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
@@ -10,12 +9,41 @@ from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
-from utils.config_utils import *
+from utils.config_utils import get_json_file
 
 
-def get_json():
-    get_json_file("lefigaro")
-    print("GOOD in get_json in browser_utils.py")
+def open_website(driver, web_name):
+    """
+    Open the website
+
+    :param driver:
+    :param web_name:
+    :return:
+    """
+    try:
+        url = get_url(web_name)
+        driver.get(url)
+        print("Website opened")
+
+    except Exception as e:
+        print("Error while opening website: ", e)
+        return
+
+
+def get_url(web_name):
+    """
+    Get the url from the config file
+
+    :param web_name:
+    :return url:
+    """
+    try:
+        url = get_json_file("url")[web_name]
+        return url
+
+    except Exception as e:
+        print("Error while getting url: ", e)
+        return
 
 
 def setup_driver(browser_name):
@@ -29,6 +57,8 @@ def setup_driver(browser_name):
         if browser_name.lower() == 'chrome':
             options = ChromeOptions()
             options.add_argument("--start-maximized")
+            # Option to avoid the "Chrome is being controlled by automated test software" popup
+            options.add_experimental_option("excludeSwitches", ["enable-automation"])
             driver = webdriver.Chrome(options=options)
             print("Driver Initialized")
 
