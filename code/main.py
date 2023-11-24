@@ -6,7 +6,7 @@ from liberation.liberation import liberation
 def main():
     # figaro()
     lacroix()
-    liberation()
+    # liberation()
     print("Hello from main.py")
 
 
