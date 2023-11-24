@@ -1,4 +1,4 @@
-from utils.browser_utils import setup_driver, quit_driver, get_json
+from utils.browser_utils import setup_driver, quit_driver, open_website
 import time
 
 
@@ -8,9 +8,10 @@ def figaro():
 
     # Setup Driver
     web_driver = setup_driver('chrome')
-    time.sleep(5)
 
-    get_json()
+    # Open website with wait
+    open_website(web_driver, "lefigaro")
+    time.sleep(50000)
 
     # Quit Driver
     quit_driver(web_driver)
