@@ -14,7 +14,7 @@ from utils.config_utils import *
 
 
 def get_json():
-    get_config_file("lefigaro")
+    get_json_file("lefigaro")
     print("GOOD in get_json in browser_utils.py")
 
 
