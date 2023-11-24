@@ -11,7 +11,8 @@ def lacroix():
 
     # Open website with wait
     open_website(web_driver, "lacroix")
-    time.sleep(50000)
+
+    # Navigation
 
     # Quit Driver
     quit_driver(web_driver)
