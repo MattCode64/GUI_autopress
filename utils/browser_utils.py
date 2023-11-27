@@ -1,3 +1,5 @@
+import time
+
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
@@ -24,6 +26,7 @@ def open_website(driver, web_name):
         url = get_url(web_name)
         driver.get(url)
         print("Website opened")
+        time.sleep(5)
 
     except Exception as e:
         print("Error while opening website: ", e)
