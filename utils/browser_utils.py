@@ -26,7 +26,7 @@ def open_website(driver, web_name):
         url = get_url(web_name)
         driver.get(url)
         print("Website opened")
-        time.sleep(5)
+        time.sleep(1)
 
     except Exception as e:
         print("Error while opening website: ", e)

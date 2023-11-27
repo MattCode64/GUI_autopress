@@ -29,7 +29,7 @@ def wait_for_element(driver, XPATH):
         element = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.XPATH, XPATH)))
         print("Element found")
-        time.sleep(2)
+        time.sleep(.2)
         return element
 
     except TimeoutException:
@@ -38,6 +38,35 @@ def wait_for_element(driver, XPATH):
 
     except Exception as e:
         print("Error while waiting for element: ", e)
+        return
+
+
+def click_on_print_button(driver):
+    try:
+        XPATH_PRINT_BUTTON = get_json_file("lacroix")["print_button"]["full_XPATH"]
+
+        print_button = wait_for_element(driver, XPATH_PRINT_BUTTON)
+        print("Print button found")
+
+        print(type(print_button))
+        print(print_button)
+
+        if print_button:
+            click(print_button)
+            print("Clicked on print button")
+            # quit()
+
+        else:
+            print("Print button is None")
+
+        time.sleep(0.5)
+
+    except TimeoutException:
+        print("Print button not found (TimeoutException)")
+        return
+
+    except Exception as e:
+        print("Error while clicking on print button: ", e)
         return
 
 
@@ -207,7 +236,7 @@ def click_on_cookies_popup(driver):
 
 
 def navigation(driver):
-    print("Navigation")
+    print("\033[33m" + "### Navigation ### " + "\033[0m")
 
     click_on_cookies_popup(driver)
 
@@ -225,5 +254,8 @@ def navigation(driver):
 
     # Click on read newspaper
     click_on_read_newspaper(driver)
+
+    # Click on print button
+    click_on_print_button(driver)
 
     time.sleep(15)
