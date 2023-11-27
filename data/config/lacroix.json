@@ -29,7 +29,7 @@
   },
   "print_button": {
     "CSS_SELECTOR": "#id26",
-    "full_XPATH": "/html/body/div[2]/div[2]/div[1]/div[10]"
+    "full_XPATH": "/html/body/div[2]/div[2]/div[1]/div[16]/div[3]"
   },
   "next_page_button": {
     "CSS_SELECTOR": "#id61",

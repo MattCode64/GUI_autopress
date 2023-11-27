@@ -15,7 +15,6 @@ def click(driver):
         driver.click()
         print("\033[31m" + "~~~~ CLICK ~~~~" + "\033[0m")
 
-    # Except if the element is not clickable
     except WebDriverException:
         print("Error of WebDriverException while clicking")
         return False
@@ -42,13 +41,10 @@ def wait_for_element(driver, XPATH):
         return
 
 
-# Function to check if the element is present
 def is_element_present(*args):
     try:
-        print(args)
         if "CSS_SELECTOR" in args:
             CSS_SELECTOR = args[args.index("CSS_SELECTOR") + 1]
-            print("CSS_SELECTOR: ", CSS_SELECTOR)
             driver = args[0]
 
             element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, CSS_SELECTOR)))
@@ -63,7 +59,6 @@ def is_element_present(*args):
         elif "XPATH" in args:
             # Search for the XPATH value
             XPATH = args[args.index("XPATH") + 1]
-            print("XPATH: ", XPATH)
             driver = args[0]
             element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, XPATH)))
             if element is None:
@@ -81,16 +76,14 @@ def is_element_present(*args):
 
 def click_on_next_page_button(driver):
     try:
-        CSS_NEXT_PAGE_BUTTON = get_json_file("lacroix")["next_page_button"]["CSS_SELECTOR"]
+        # CSS_NEXT_PAGE_BUTTON = get_json_file("lacroix")["next_page_button"]["CSS_SELECTOR"]
         XPATH_NEXT_PAGE_BUTTON = get_json_file("lacroix")["next_page_button"]["full_XPATH"]
 
-        # Click on next page button if is element present is True
         if is_element_present(driver, "XPATH", XPATH_NEXT_PAGE_BUTTON):
             next_page_button = wait_for_element(driver, XPATH_NEXT_PAGE_BUTTON)
             print("Next page button found")
-            assertion = click(next_page_button)
-            if assertion is False:
-                print("Error while clicking on next page button")
+            if click(next_page_button) is False:
+                print("No more pages")
                 return False
 
             else:
@@ -116,8 +109,6 @@ def click_on_print_button(driver):
 
         print_button = wait_for_element(driver, XPATH_PRINT_BUTTON)
         print("Print button found")
-
-        print(type(print_button))
         print(print_button)
 
         if print_button:
@@ -325,16 +316,16 @@ def navigation(driver):
     # Click on read newspaper
     click_on_read_newspaper(driver)
 
-    # Click on print button
-    # click_on_print_button(driver)
-
     # While there is a next page button, click on it
     condition = True
 
     while condition is True:
+        # Print button
+        click_on_print_button(driver)
+        time.sleep(10)
         condition = click_on_next_page_button(driver)
         time.sleep(0.5)
         print("Condition: ", condition)
 
     # End
-    time.sleep(150)
+    time.sleep(1500)
