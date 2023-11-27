@@ -59,7 +59,8 @@ def setup_driver(browser_name):
     try:
         if browser_name.lower() == 'chrome':
             options = ChromeOptions()
-            options.add_argument("--start-maximized")
+            # Add option to start the browser in format 1280 x 720.
+            options.add_argument("--window-size=720,1280")
             # Option to avoid the "Chrome is being controlled by automated test software" popup
             options.add_experimental_option("excludeSwitches", ["enable-automation"])
             driver = webdriver.Chrome(options=options)

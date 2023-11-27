@@ -28,7 +28,7 @@ def wait_for_element(driver, XPATH):
     try:
         element = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.XPATH, XPATH)))
-        print("Element found")
+        print("Element found. Waiting...")
         time.sleep(.2)
         return element
 
@@ -39,6 +39,47 @@ def wait_for_element(driver, XPATH):
     except Exception as e:
         print("Error while waiting for element: ", e)
         return
+
+
+# Function to check if the element is present
+def is_element_present(driver, XPATH):
+    try:
+        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, XPATH)))
+        print("Element exists.")
+        time.sleep(.2)
+        return True
+
+    except Exception as e:
+        print("Error while checking if element is present: ", e)
+        return False
+
+
+def click_on_next_page_button(driver):
+    try:
+        XPATH_NEXT_PAGE_BUTTON = get_json_file("lacroix")["next_page_button"]["full_XPATH"]
+
+        print("In click_on_next_page_button, return : ", is_element_present(driver, XPATH_NEXT_PAGE_BUTTON))
+        if is_element_present(driver, XPATH_NEXT_PAGE_BUTTON) is True:
+            next_page_button = wait_for_element(driver, XPATH_NEXT_PAGE_BUTTON)
+            print("Next page button found")
+
+            click(next_page_button)
+            print("Clicked on next page button")
+            time.sleep(0.2)
+
+            return True
+
+        else:
+            print("Next page button not found")
+            return False
+
+    except TimeoutException:
+        print("Next page button not found (TimeoutException)")
+        return
+
+    except Exception as e:
+        print("Error while clicking on next page button: ", e)
+        return False
 
 
 def click_on_print_button(driver):
@@ -54,10 +95,11 @@ def click_on_print_button(driver):
         if print_button:
             click(print_button)
             print("Clicked on print button")
-            # quit()
 
         else:
             print("Print button is None")
+            # End
+            quit()
 
         time.sleep(0.5)
 
@@ -256,6 +298,15 @@ def navigation(driver):
     click_on_read_newspaper(driver)
 
     # Click on print button
-    click_on_print_button(driver)
+    # click_on_print_button(driver)
 
-    time.sleep(15)
+    # While there is a next page button, click on it
+    condition = True
+
+    while condition is True:
+        condition = click_on_next_page_button(driver)
+        time.sleep(0.5)
+        print("Condition: ", condition)
+
+    # End
+    time.sleep(150)
