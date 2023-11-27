@@ -15,13 +15,14 @@ def click(driver):
         driver.click()
         print("\033[31m" + "~~~~ CLICK ~~~~" + "\033[0m")
 
+    # Except if the element is not clickable
     except WebDriverException:
         print("Error of WebDriverException while clicking")
-        return
+        return False
 
     except Exception as e:
         print("Error while clicking: ", e)
-        return
+        return False
 
 
 def wait_for_element(driver, XPATH):
@@ -42,12 +43,36 @@ def wait_for_element(driver, XPATH):
 
 
 # Function to check if the element is present
-def is_element_present(driver, XPATH):
+def is_element_present(*args):
     try:
-        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, XPATH)))
-        print("Element exists.")
-        time.sleep(.2)
-        return True
+        print(args)
+        if "CSS_SELECTOR" in args:
+            CSS_SELECTOR = args[args.index("CSS_SELECTOR") + 1]
+            print("CSS_SELECTOR: ", CSS_SELECTOR)
+            driver = args[0]
+
+            element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, CSS_SELECTOR)))
+            if element is None:
+                print("Element not present")
+                return False
+
+            else:
+                print("Element present")
+                return True
+
+        elif "XPATH" in args:
+            # Search for the XPATH value
+            XPATH = args[args.index("XPATH") + 1]
+            print("XPATH: ", XPATH)
+            driver = args[0]
+            element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, XPATH)))
+            if element is None:
+                print("Element not present")
+                return False
+
+            else:
+                print("Element present")
+                return True
 
     except Exception as e:
         print("Error while checking if element is present: ", e)
@@ -56,18 +81,21 @@ def is_element_present(driver, XPATH):
 
 def click_on_next_page_button(driver):
     try:
+        CSS_NEXT_PAGE_BUTTON = get_json_file("lacroix")["next_page_button"]["CSS_SELECTOR"]
         XPATH_NEXT_PAGE_BUTTON = get_json_file("lacroix")["next_page_button"]["full_XPATH"]
 
-        print("In click_on_next_page_button, return : ", is_element_present(driver, XPATH_NEXT_PAGE_BUTTON))
-        if is_element_present(driver, XPATH_NEXT_PAGE_BUTTON) is True:
+        # Click on next page button if is element present is True
+        if is_element_present(driver, "XPATH", XPATH_NEXT_PAGE_BUTTON):
             next_page_button = wait_for_element(driver, XPATH_NEXT_PAGE_BUTTON)
             print("Next page button found")
+            assertion = click(next_page_button)
+            if assertion is False:
+                print("Error while clicking on next page button")
+                return False
 
-            click(next_page_button)
-            print("Clicked on next page button")
-            time.sleep(0.2)
-
-            return True
+            else:
+                print("Clicked on next page button")
+                return True
 
         else:
             print("Next page button not found")
@@ -75,7 +103,7 @@ def click_on_next_page_button(driver):
 
     except TimeoutException:
         print("Next page button not found (TimeoutException)")
-        return
+        return False
 
     except Exception as e:
         print("Error while clicking on next page button: ", e)
