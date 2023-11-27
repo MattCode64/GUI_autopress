@@ -235,6 +235,10 @@ def OpenWebsite(driver, config_file, website_name):
         URL = GetURL(config_file, website_name)
         driver.get(URL)
         print("Website opened")
+        print("### PLEASE PUT SCREEN ON PORTRAIT MODE (20 seconds) ###")
+
+        # add a timer of 20 seconds to allow user to put screen on portrait mode
+        time.sleep(20)
 
     except Exception as e:
         print("Error while opening website: ", e)
@@ -266,6 +270,10 @@ def QuitDriver(driver):
 
 def SetupDriver(browser_name):
     try:
+
+
+
+
         if browser_name.lower() == 'chrome':
             options = ChromeOptions()
             options.add_argument("--window-size=1080,1920")
