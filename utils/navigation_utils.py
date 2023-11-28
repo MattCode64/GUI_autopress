@@ -361,7 +361,7 @@ def navigation(driver, web_name):
         # Print button
         click_on_print_button(driver, web_name)
         automatise_print()
-        time.sleep(100)
+        time.sleep(10)
         condition = click_on_next_page_button(driver, web_name)
         time.sleep(0.5)
 
