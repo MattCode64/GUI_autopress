@@ -8,6 +8,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.common.exceptions import WebDriverException
 from selenium.common.exceptions import TimeoutException
 from utils.config_utils import get_json_file
+from utils.autoui_utils import automatise_print
 
 
 def click(driver):
@@ -358,10 +359,11 @@ def navigation(driver, web_name):
 
     while condition is True:
         # Print button
-        # click_on_print_button(driver, web_name)
-        # time.sleep(10)
+        click_on_print_button(driver, web_name)
+        automatise_print()
+        time.sleep(100)
         condition = click_on_next_page_button(driver, web_name)
         time.sleep(0.5)
 
     # End
-    time.sleep(15)
+    time.sleep(5)

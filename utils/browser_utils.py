@@ -4,13 +4,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
 from selenium.webdriver.edge.options import Options as EdgeOptions
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import WebDriverException
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.by import By
 from utils.config_utils import get_json_file
 
 
@@ -61,8 +55,14 @@ def setup_driver(browser_name):
             options = ChromeOptions()
             # Add option to start the browser in format 1280 x 720.
             options.add_argument("--window-size=720,1280")
-            # Option to avoid the "Chrome is being controlled by automated test software" popup
             options.add_experimental_option("excludeSwitches", ["enable-automation"])
+            options.add_experimental_option('useAutomationExtension', False)
+            # Add option to not ask for where to save the file.
+            options.add_experimental_option("prefs", {
+                "download.prompt_for_download": False,  # Désactive la demande de confirmation avant le téléchargement
+                "download.directory_upgrade": True,
+                "safebrowsing.enabled": True  # Active la protection de navigation
+            })
             driver = webdriver.Chrome(options=options)
             print("Driver Initialized")
 

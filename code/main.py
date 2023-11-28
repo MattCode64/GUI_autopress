@@ -1,4 +1,4 @@
-from figaro.figaro import figaro
+# from figaro.figaro import figaro
 from lacroix.lacroix import lacroix
 from liberation.liberation import liberation
 
