@@ -5,9 +5,9 @@ from liberation.liberation import liberation
 
 def main():
     print("Hello from main.py")
-    # figaro()
-    # lacroix()
+    lacroix()
     liberation()
+    # figaro()
     print("Ending main.py")
 
 

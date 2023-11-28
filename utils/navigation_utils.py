@@ -16,7 +16,7 @@ def click(driver):
         print("\033[31m" + "~~~~ CLICK ~~~~" + "\033[0m")
 
     except WebDriverException:
-        print("Error of WebDriverException while clicking")
+        print("WebDriverException while clicking")
         return False
 
     except Exception as e:

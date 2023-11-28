@@ -1,0 +1,42 @@
+{
+  "cookies_button": {
+    "CSS_SELECTOR": "#didomi-notice-agree-button",
+    "full_XPATH": "/html/body/div[1]/div/div/div/div/div/div[3]/button[2]"
+  },
+  "se_connecter_button": {
+    "CSS_SELECTOR": "#right_column > div:nth-child(2) > div.ui.two.columns.grid > div > a",
+    "full_XPATH": "/html/body/div[3]/div[1]/div[2]/div[1]/div[2]/div[2]/div[2]/div[1]/div/a"
+  },
+  "email": {
+    "CSS_SELECTOR": "#\\31 -email",
+    "full_XPATH": "/html/body/main/div/div[2]/form/div/div/div/div/div[2]/div[2]/span/div/div/div/div/div/div/div/div/div[2]/div[3]/div[1]/div/input"
+  },
+  "password": {
+    "CSS_SELECTOR": "#\\31 -password",
+    "full_XPATH": "/html/body/main/div/div[2]/form/div/div/div/div/div[2]/div[2]/span/div/div/div/div/div/div/div/div/div[2]/div[3]/div[2]/div[1]/div/input"
+  },
+  "keep_logged_in": {
+    "CSS_SELECTOR": "#\\31 -submit > span",
+    "full_XPATH": "/html/body/main/div/div[2]/form/div/div/div/button/span"
+  },
+  "login": {
+    "CSS_SELECTOR": "#\\31 -submit > span",
+    "full_XPATH": "/html/body/main/div/div[2]/form/div/div/div/button/span"
+  },
+  "read": {
+    "CSS_SELECTOR": "#right_column > div:nth-child(2) > div.ui.two.columns.grid > div > a",
+    "full_XPATH": "/html/body/div[3]/div[1]/div[2]/div[1]/div[2]/div[2]/div[2]/div[1]/div/a"
+  },
+  "more_options": {
+    "CSS_SELECTOR": "#id34",
+    "full_XPATH": "/html/body/div[1]/div[2]/div[1]/div[14]"
+  },
+  "print_button": {
+    "CSS_SELECTOR": "#id48",
+    "full_XPATH": "/html/body/div[1]/div[2]/div[1]/div[16]/div[3]"
+  },
+  "next_page_button": {
+    "CSS_SELECTOR": "#id61",
+    "full_XPATH": "/html/body/div[1]/div[2]/div[2]/div[3]"
+  }
+}

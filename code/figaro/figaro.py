@@ -1,4 +1,5 @@
 from utils.browser_utils import setup_driver, quit_driver, open_website
+from utils.navigation_utils import navigation
 import time
 
 
@@ -10,8 +11,12 @@ def figaro():
     web_driver = setup_driver('chrome')
 
     # Open website with wait
-    open_website(web_driver, "lefigaro")
-    time.sleep(50000)
+    website_name = "lefigaro"
+    open_website(web_driver, website_name)
+    time.sleep(1000)
+
+    # Navigation
+    navigation(web_driver, website_name)
 
     # Quit Driver
     quit_driver(web_driver)
