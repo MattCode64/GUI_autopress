@@ -11,10 +11,11 @@ def lacroix():
     web_driver = setup_driver('chrome')
 
     # Open website with wait
-    open_website(web_driver, "lacroix")
+    website_name = "lacroix"
+    open_website(web_driver, website_name)
 
     # Navigation
-    navigation(web_driver)
+    navigation(web_driver, website_name)
 
     # Quit Driver
     quit_driver(web_driver)
