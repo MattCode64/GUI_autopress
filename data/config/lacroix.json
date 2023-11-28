@@ -27,6 +27,10 @@
     "CSS_SELECTOR": "#right_column > div:nth-child(2) > div > div > a",
     "full_XPATH": "/html/body/div[4]/div[1]/div[2]/div[1]/div[2]/div[2]/div[2]/div/div/a"
   },
+  "more_options": {
+    "CSS_SELECTOR": "#id34",
+    "full_XPATH": "/html/body/div[2]/div[2]/div[1]/div[14]"
+  },
   "print_button": {
     "CSS_SELECTOR": "#id26",
     "full_XPATH": "/html/body/div[2]/div[2]/div[1]/div[16]/div[3]"

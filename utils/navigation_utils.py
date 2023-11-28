@@ -47,7 +47,7 @@ def is_element_present(*args):
             CSS_SELECTOR = args[args.index("CSS_SELECTOR") + 1]
             driver = args[0]
 
-            element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, CSS_SELECTOR)))
+            element = wait_for_element(driver, CSS_SELECTOR)
             if element is None:
                 print("Element not present")
                 return False
@@ -103,13 +103,32 @@ def click_on_next_page_button(driver):
         return False
 
 
+def click_on_more_options_button(driver):
+    try:
+        XPATH_MORE_OPTIONS_BUTTON = get_json_file("lacroix")["more_options"]["full_XPATH"]
+
+        more_options_button = wait_for_element(driver, XPATH_MORE_OPTIONS_BUTTON)
+        print("More options button found")
+
+        click(more_options_button)
+        print("Clicked on more options button")
+        time.sleep(0.5)
+
+    except TimeoutException:
+        print("More options button not found (TimeoutException)")
+        return
+
+    except Exception as e:
+        print("Error while clicking on more options button: ", e)
+        return
+
+
 def click_on_print_button(driver):
     try:
         XPATH_PRINT_BUTTON = get_json_file("lacroix")["print_button"]["full_XPATH"]
 
         print_button = wait_for_element(driver, XPATH_PRINT_BUTTON)
         print("Print button found")
-        print(print_button)
 
         if print_button:
             click(print_button)
@@ -123,11 +142,11 @@ def click_on_print_button(driver):
         time.sleep(0.5)
 
     except TimeoutException:
-        print("Print button not found (TimeoutException)")
+        print("More options button not found (TimeoutException)")
         return
 
     except Exception as e:
-        print("Error while clicking on print button: ", e)
+        print("Error while clicking on more options button: ", e)
         return
 
 
@@ -316,13 +335,16 @@ def navigation(driver):
     # Click on read newspaper
     click_on_read_newspaper(driver)
 
+    # Click on more options button
+    click_on_more_options_button(driver)
+
     # While there is a next page button, click on it
     condition = True
 
     while condition is True:
         # Print button
         click_on_print_button(driver)
-        time.sleep(10)
+        time.sleep(30)
         condition = click_on_next_page_button(driver)
         time.sleep(0.5)
         print("Condition: ", condition)
