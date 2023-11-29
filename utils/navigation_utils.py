@@ -8,7 +8,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.common.exceptions import WebDriverException
 from selenium.common.exceptions import TimeoutException
 from utils.config_utils import get_json_file
-from utils.autoui_utils import automatise_print
+from utils.autoui_utils import *
 
 
 def click(driver):
@@ -331,6 +331,66 @@ def click_on_cookies_popup(driver, web_name):
         return
 
 
+def automatise_print(first_iteration, name):
+    if first_iteration is True:
+        # Tabulate 5 times
+        tabulate(5, 2)
+
+        # Enter 1 time
+        enter(1, 1)
+
+        # Down arrow 1 time
+        down_arrow(1, 1)
+
+        # Enter 1 time
+        enter(1, 1)
+
+        # Tabulate 4 times
+        tabulate(4, 1)
+
+        # Enter 1 time
+        enter(1, 10)
+
+        # Save the file
+        save_file(1, name)
+
+        # Enter 1 time
+        enter(1, 1)
+
+        # Close window
+        ctrl_w(1, 1)
+
+    else:
+        enter(1, 1)
+        save_file(1, name)
+        enter(2, 1)
+        ctrl_w(1, 1)
+
+
+def automatise(driver, web_name, first_iteration=True):
+    condition = True
+    name = 0
+
+    while condition:
+        if first_iteration:
+            time.sleep(5)
+            click_on_print_button(driver, web_name)
+            time.sleep(5)
+            automatise_print(first_iteration, web_name + str(name))
+            name += 1
+            first_iteration = False
+
+        else:
+            time.sleep(20)
+            click_on_print_button(driver, web_name)
+            time.sleep(5)
+            automatise_print(first_iteration, web_name + str(name))
+            time.sleep(5)
+            condition = click_on_next_page_button(driver, web_name)
+            time.sleep(5)
+            name += 1
+
+
 def navigation(driver, web_name):
     print("\033[33m" + "### Navigation ### " + "\033[0m")
 
@@ -355,15 +415,7 @@ def navigation(driver, web_name):
     click_on_more_options_button(driver, web_name)
 
     # While there is a next page button, click on it
-    condition = True
-
-    while condition is True:
-        # Print button
-        click_on_print_button(driver, web_name)
-        automatise_print()
-        time.sleep(10)
-        condition = click_on_next_page_button(driver, web_name)
-        time.sleep(0.5)
+    automatise(driver, web_name)
 
     # End
-    time.sleep(5)
+    time.sleep(9995)
