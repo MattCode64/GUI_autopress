@@ -8,7 +8,8 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.common.exceptions import WebDriverException
 from selenium.common.exceptions import TimeoutException
 from utils.config_utils import get_json_file
-from utils.autoui_utils import *
+from utils.autoui_utils import tabulate, enter, down_arrow, save_file, ctrl_w
+from utils.manage_file_utils import merge_pdf
 
 
 def click(driver):
@@ -441,6 +442,10 @@ def navigation(driver, web_name):
         # While there is a next page button, click on it
         automatise(driver, web_name)
 
+        # Merge pdf
+        print("Merging pdf...")
+        merge_pdf(web_name)
+
     elif web_name == 'liberation':
         # Switch iframe
         switch_iframe(driver, web_name, mode='iframe')
@@ -471,6 +476,10 @@ def navigation(driver, web_name):
 
         # While there is a next page button, click on it
         automatise(driver, web_name)
+
+        # Merge pdf
+        print("Merging pdf...")
+        merge_pdf(web_name)
 
     # End
     time.sleep(10)

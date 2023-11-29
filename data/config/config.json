@@ -6,7 +6,6 @@
         "lacroix": "https://journal.la-croix.com/",
         "liberation": "https://journal.liberation.fr/"
     },
-
     "credentials": {
         "lopinion": {
             "email": "veidzedezdze.fr",
@@ -33,9 +32,9 @@
         "pdf_dir": "../../data/pdf",
         "image_dirOPI": "../../data/imagesOPI",
         "image_dirLE": "../../data/imagesLE",
-        "html_file_path": "../../data/html/page.html"
+        "html_file_path": "../../data/html/page.html",
+        "download_dir": "C:\\Users\\freir\\Downloads"
     },
-
     "shadow_root": {
         "body": "body > epaper-application > div > view-publication",
         "nav": "div > book-cover > book-navigation",
