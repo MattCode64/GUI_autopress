@@ -1,6 +1,5 @@
 from utils.browser_utils import setup_driver, quit_driver, open_website
 from utils.navigation_utils import navigation
-import time
 
 
 def lacroix():
@@ -14,7 +13,7 @@ def lacroix():
     website_name = "lacroix"
     open_website(web_driver, website_name)
 
-    # Navigation
+    # Navigation and Automation
     navigation(web_driver, website_name)
 
     # Quit Driver

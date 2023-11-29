@@ -53,16 +53,8 @@ def setup_driver(browser_name):
     try:
         if browser_name.lower() == 'chrome':
             options = ChromeOptions()
-            # Add option to start the browser in format 1280 x 720.
             options.add_argument("--window-size=720,1280")
             options.add_experimental_option("excludeSwitches", ["enable-automation"])
-            options.add_experimental_option('useAutomationExtension', False)
-            # Add option to not ask for where to save the file.
-            options.add_experimental_option("prefs", {
-                "download.prompt_for_download": False,  # Désactive la demande de confirmation avant le téléchargement
-                "download.directory_upgrade": True,
-                "safebrowsing.enabled": True  # Active la protection de navigation
-            })
             driver = webdriver.Chrome(options=options)
             print("Driver Initialized")
 

@@ -1,7 +1,11 @@
 {
+  "iframe_cookies": {
+    "CSS_SELECTOR": "#sp_message_iframe_930373",
+    "full_XPATH": "/html/body/div[5]/iframe"
+  },
   "cookies_button": {
-    "CSS_SELECTOR": "#didomi-notice-agree-button",
-    "full_XPATH": "/html/body/div[1]/div/div/div/div/div/div[3]/button[2]"
+    "CSS_SELECTOR": "#notice > div.message-component.message-row.cmpFooter > div > button.message-component.message-button.no-children.focusable.start-focus.sp_choice_type_11",
+    "full_XPATH": "/html/body/div/div[2]/div[5]/div/button[2]"
   },
   "se_connecter_button": {
     "CSS_SELECTOR": "#right_column > div:nth-child(2) > div.ui.two.columns.grid > div > a",

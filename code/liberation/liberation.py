@@ -1,5 +1,3 @@
-import time
-
 from utils.browser_utils import setup_driver, quit_driver, open_website
 from utils.navigation_utils import navigation
 
@@ -14,9 +12,8 @@ def liberation():
     # Open website with wait
     website_name = "liberation"
     open_website(web_driver, website_name)
-    # time.sleep(100)
 
-    # Navigation
+    # Navigation and Automation
     navigation(web_driver, website_name)
 
     # Quit Driver

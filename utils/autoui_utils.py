@@ -1,4 +1,5 @@
 import pyautogui as pag
+import datetime
 
 
 def tabulate(times, delay):
@@ -30,5 +31,7 @@ def ctrl_w(times, delay):
 
 
 def save_file(delay, name):
-    pag.typewrite(name)
     pag.sleep(delay)
+    print("\033[92m" + "SAVE PDF FILE | PAGE : " + name.upper() + "\033[0m")
+    pag.typewrite(name + " " + str(datetime.date.today()))
+    pag.sleep(delay+0.5)

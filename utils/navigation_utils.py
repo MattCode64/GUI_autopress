@@ -14,7 +14,6 @@ from utils.autoui_utils import *
 def click(driver):
     try:
         driver.click()
-        print("\033[31m" + "~~~~ CLICK ~~~~" + "\033[0m")
 
     except WebDriverException:
         print("WebDriverException while clicking")
@@ -23,6 +22,8 @@ def click(driver):
     except Exception as e:
         print("Error while clicking: ", e)
         return False
+    else:
+        print("\033[31m" + "~~~~ CLICK ~~~~" + "\033[0m")
 
 
 def wait_for_element(*args):
@@ -331,40 +332,67 @@ def click_on_cookies_popup(driver, web_name):
         return
 
 
+def switch_iframe(driver, web_name, mode):
+    try:
+        if mode == 'iframe':
+            PATH_IFRAME = get_json_file(web_name)["iframe_cookies"]["full_XPATH"]
+
+            iframe = wait_for_element(driver, "XPATH", PATH_IFRAME)
+            print("Iframe found")
+            driver.switch_to.frame(iframe)
+
+        elif mode == 'default':
+            driver.switch_to.default_content()
+            print("Switched to default content")
+
+    except TimeoutException:
+        print("Iframe not found (TimeoutException)")
+        return
+
+    except Exception as e:
+        print("Error while switching to iframe: ", e)
+        return
+
+    else:
+        print("Switched to iframe")
+
+
 def automatise_print(first_iteration, name):
     if first_iteration is True:
+        time.sleep(2)
         # Tabulate 5 times
-        tabulate(5, 2)
+        tabulate(5, .5)
 
         # Enter 1 time
-        enter(1, 1)
+        enter(1, .5)
 
         # Down arrow 1 time
-        down_arrow(1, 1)
+        down_arrow(1, .5)
 
         # Enter 1 time
-        enter(1, 1)
+        enter(1, .5)
 
         # Tabulate 4 times
-        tabulate(4, 1)
+        tabulate(4, .5)
 
         # Enter 1 time
-        enter(1, 10)
+        enter(1, .5)
 
         # Save the file
         save_file(1, name)
 
         # Enter 1 time
-        enter(1, 1)
+        enter(1, .5)
 
         # Close window
-        ctrl_w(1, 1)
+        ctrl_w(1, .5)
 
     else:
-        enter(1, 1)
+        time.sleep(2)
+        enter(1, .5)
         save_file(1, name)
-        enter(2, 1)
-        ctrl_w(1, 1)
+        enter(1, .5)
+        ctrl_w(1, .5)
 
 
 def automatise(driver, web_name, first_iteration=True):
@@ -373,49 +401,76 @@ def automatise(driver, web_name, first_iteration=True):
 
     while condition:
         if first_iteration:
-            time.sleep(5)
             click_on_print_button(driver, web_name)
-            time.sleep(5)
             automatise_print(first_iteration, web_name + str(name))
             name += 1
+            condition = click_on_next_page_button(driver, web_name)
             first_iteration = False
 
         else:
-            time.sleep(20)
             click_on_print_button(driver, web_name)
-            time.sleep(5)
             automatise_print(first_iteration, web_name + str(name))
-            time.sleep(5)
             condition = click_on_next_page_button(driver, web_name)
-            time.sleep(5)
             name += 1
 
 
 def navigation(driver, web_name):
     print("\033[33m" + "### Navigation ### " + "\033[0m")
 
-    click_on_cookies_popup(driver, web_name)
+    if web_name == 'lacroix':
+        click_on_cookies_popup(driver, web_name)
 
-    # Click on se connecter button
-    clik_on_se_connecter_button(driver, web_name)
+        # Click on se connecter button
+        clik_on_se_connecter_button(driver, web_name)
 
-    # Email and password
-    input_email_password(driver, web_name)
+        # Email and password
+        input_email_password(driver, web_name)
 
-    # Click on keep me logged in
-    click_on_keep_me_logged_in(driver, web_name)
+        # Click on keep me logged in
+        click_on_keep_me_logged_in(driver, web_name)
 
-    # Click on login button
-    click_on_login_button(driver, web_name)
+        # Click on login button
+        click_on_login_button(driver, web_name)
 
-    # Click on read newspaper
-    click_on_read_newspaper(driver, web_name)
+        # Click on read newspaper
+        click_on_read_newspaper(driver, web_name)
 
-    # Click on more options button
-    click_on_more_options_button(driver, web_name)
+        # Click on more options button
+        click_on_more_options_button(driver, web_name)
 
-    # While there is a next page button, click on it
-    automatise(driver, web_name)
+        # While there is a next page button, click on it
+        automatise(driver, web_name)
+
+    elif web_name == 'liberation':
+        # Switch iframe
+        switch_iframe(driver, web_name, mode='iframe')
+
+        # Click on cookies popup
+        click_on_cookies_popup(driver, web_name)
+
+        # Switch iframe
+        switch_iframe(driver, web_name, mode='default')
+
+        # Click on se connecter button
+        clik_on_se_connecter_button(driver, web_name)
+
+        # Email and password
+        input_email_password(driver, web_name)
+
+        # Click on keep me logged in
+        click_on_keep_me_logged_in(driver, web_name)
+
+        # Click on login button
+        click_on_login_button(driver, web_name)
+
+        # Click on read newspaper
+        click_on_read_newspaper(driver, web_name)
+
+        # Click on more options button
+        click_on_more_options_button(driver, web_name)
+
+        # While there is a next page button, click on it
+        automatise(driver, web_name)
 
     # End
-    time.sleep(9995)
+    time.sleep(10)
