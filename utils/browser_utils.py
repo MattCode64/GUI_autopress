@@ -60,14 +60,14 @@ def setup_driver(browser_name):
 
         elif browser_name.lower() == 'firefox':
             options = FirefoxOptions()
-            options.add_argument("--start-maximized")
+            options.add_argument("--window-size=720,1280")
             driver = webdriver.Firefox(options=options)
             print("Driver Initialized")
 
         elif browser_name.lower() == 'edge':
             options = EdgeOptions()
             options.use_chromium = True
-            options.add_argument("--start-maximized")
+            options.add_argument("--window-size=720,1280")
             driver = webdriver.Edge(options=options)
             print("Driver Initialized")
 

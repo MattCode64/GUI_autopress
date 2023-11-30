@@ -22,7 +22,7 @@ def open_config():
     """
     Open the config file
 
-    :return:
+    :return configJson:
     """
     try:
         with open(os.path.join(os.path.dirname(__file__), f'../data/config/config.json'), "r") as f:
@@ -38,7 +38,7 @@ def open_config_file(media):
     Open the config file for a specific media
 
     :param media:
-    :return:
+    :return configJson:
     """
     try:
         with open(os.path.join(os.path.dirname(__file__), f'../data/config/{media}.json'), "r") as f:
@@ -54,21 +54,21 @@ def get_json_file(*args):
     Get the json file
 
     :param args:
-    :return:
+    :return configJson: field of the config file
     """
     try:
         if any(keyword in args for keyword in ["url", "credentials", "pdf", "directories"]):
             configJson = open_config()
             return configJson[args[0]]
 
-        elif any(media in args for media in ["lefigaro", "lacroix", "liberation"]):
+        elif any(media in args for media in ["lefigaro", "lacroix", "liberation", "config"]):
             configJson = open_config_file(args[0])
             return configJson
 
-        # Elif return the config file entirely
-        elif "config" in args:
-            configJson = open_config()
-            return configJson
+        # # Elif return the config file entirely
+        # elif "config" in args:
+        #     configJson = open_config()
+        #     return configJson
 
         else:
             print("Error while getting config file")

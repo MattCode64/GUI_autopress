@@ -1,22 +1,35 @@
 {
-    "cookies_button": {
-        "CSS_SELECTOR": "body > div > div > div > div > div > div > div.sc-lbhJGD.fMKlmZ > div > button.sc-furwcr.jhwOCG.button.button--filled.button__acceptAll",
-        "full_XPATH": "/html/body/div/div/div/div/div/div/div[4]/div/button[1]"
-    },
-    "email": {
-        "CSS_SELECTOR": "#username",
-        "full_XPATH": "/html/body/div[1]/section/div/div/div[2]/form/div[1]/input"
-    },
-    "password": {
-        "CSS_SELECTOR": "#password",
-        "full_XPATH": "/html/body/div[1]/section/div/div/div[2]/form/div[2]/input"
-    },
-    "login": {
-        "CSS_SELECTOR": "#wrapper > section > div > div > div.agc-login__body > form > div.agc-spacer-bottom > button",
-        "full_XPATH": "/html/body/div[1]/section/div/div/div[2]/form/div[3]/button"
-    },
-    "reader": {
-        "CSS_SELECTOR": "#right_column > div:nth-child(2) > div > div > a",
-        "full_XPATH": "/html/body/div[4]/div[1]/div[1]/div[1]/div[2]/div[2]/div[2]/div/div/a"
-    }
+  "iframe_cookies": {
+    "CSS_SELECTOR": "#appconsent > iframe",
+    "full_XPATH": "/html/body/div[6]/iframe"
+  },
+  "cookies_button": {
+    "CSS_SELECTOR": "body > div > div > div > div > div > div > div.sc-lbhJGD.fMKlmZ > div > button.sc-furwcr.jhwOCG.button.button--filled.button__acceptAll",
+    "full_XPATH": "/html/body/div/div/div/div/div/div/div[4]/div/button[1]"
+  },
+  "se_connecter_button": {
+    "CSS_SELECTOR": "#right_column > div:nth-child(2) > div > div:nth-child(2) > a",
+    "full_XPATH": "/html/body/div[4]/div[1]/div[1]/div[1]/div[2]/div[2]/div[2]/div/div[2]/a"
+  },
+
+  "iframe_captcha": {
+    "CSS_SELECTOR": "body > div:nth-child(16) > div:nth-child(1) > iframe",
+    "full_XPATH": "/html/body/div[1]/section/div/div/div[2]/form/div[1]/input"
+  },
+  "email": {
+    "CSS_SELECTOR": "#username",
+    "full_XPATH": "/html/body/div[1]/section/div/div/div[2]/form/div[1]/input"
+  },
+  "password": {
+    "CSS_SELECTOR": "#password",
+    "full_XPATH": "/html/body/div[1]/section/div/div/div[2]/form/div[2]/input"
+  },
+  "login": {
+    "CSS_SELECTOR": "#wrapper > section > div > div > div.agc-login__body > form > div.agc-spacer-bottom > button",
+    "full_XPATH": "/html/body/div[1]/section/div/div/div[2]/form/div[3]/button"
+  },
+  "reader": {
+    "CSS_SELECTOR": "#right_column > div:nth-child(2) > div > div > a",
+    "full_XPATH": "/html/body/div[4]/div[1]/div[1]/div[1]/div[2]/div[2]/div[2]/div/div/a"
+  }
 }
