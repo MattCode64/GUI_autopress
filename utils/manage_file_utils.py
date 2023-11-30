@@ -6,24 +6,25 @@ from utils.config_utils import get_json_file, write_json_file
 from PyPDF2 import PdfMerger
 
 
-def delete_pdf_files(path, website_name):
+def delete_pdf_files(path, files_name):
     """
-    Function to delete the pdf files
-    :param website_name:
+    Delete the pdf files depending on the names in the list files_name
+
     :param path:
+    :param files_name:
     :return:
     """
     try:
-        # If there is one or more pdf files with the website_name, delete them except the last one
-        if any(f.endswith(f"{website_name}") for f in os.listdir(path)):
-            pdf_files = [f for f in os.listdir(path) if f.endswith(f"{website_name}")]
-            for pdf in pdf_files[:-1]:
-                os.remove(os.path.join(path, pdf))
+        for file in files_name:
+            os.remove(os.path.join(path, file))
 
-        else:
-            print("No pdf files to delete")
-            return
+            if os.path.exists(os.path.join(path, file)):
+                print(f"The file {file}" + "\033[1m" + "does not exist or has been deleted successfully" + "\033[0m")
 
+    except FileNotFoundError:
+        print("FileNotFoundError")
+    except OSError:
+        print("OSError")
     except Exception as e:
         print(f"Error in delete_pdf_files: {e}")
 
@@ -167,10 +168,24 @@ def merge_pdf(output_name):
         merger.close()
 
         # Delete the pdf files
-        print("DELETE PDF FILES")
-        delete_pdf_files(download_path, website_name=output_name)
-    # try:
+        delete_pdf_files(download_path, files_name=pdf_files)
+
+    # else:
+    #     print(f"MERGING PDF FOR OTHERS MEDIA : {output_name.upper()}")
+    #     # Get download path
+    #     download_path = get_download_path()
     #
+    #     # Get the pdf files
+    #     pdf_files = [f for f in os.listdir(download_path) if f.endswith(".pdf")]
     #
-    # except Exception as e:
-    #     print(f"Error in merge_pdf: {e}")
+    #     # Merge the pdf files
+    #     merger = PdfMerger()
+    #
+    #     for pdf in pdf_files:
+    #         merger.append(os.path.join(download_path, pdf))
+    #
+    #     merger.write(os.path.join(download_path, f"JOURNAL{output_name}" + str(datetime.date.today()) + ".pdf"))
+    #     merger.close()
+    #
+    #     # Delete the pdf files
+    #     delete_pdf_files(download_path, files_name=pdf_files)
