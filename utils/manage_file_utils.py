@@ -15,6 +15,7 @@ def delete_pdf_files(path, files_name):
     :return:
     """
     try:
+        print("Deleting pdf files...")
         for file in files_name:
             os.remove(os.path.join(path, file))
 
@@ -64,7 +65,6 @@ def get_download_path():
     """
     # Get the default download path
     default_download_path = get_download_path_from_system()
-    print(default_download_path)
 
     # Change the download path
     change_download_path(default_download_path)
@@ -74,118 +74,43 @@ def get_download_path():
 
     # Return the new download path
     path = config['download_dir']
-    print(path)
-    print(type(path))
     return path
-    # try:
-    #
-    #
-    # except Exception as e:
-    #     print(f"Error in change_download_path: {e}")
 
 
-def extract_number(filename):
-    match = re.search(r"lacroix(\d{1,2}) \d{4}-\d{2}-\d{2}\.pdf", filename)
+def extract_number(filename, pattern):
+    match = re.search(pattern, filename)
     if match:
         return int(match.group(1))
-    return 0  # Retourner 0 si aucun nombre n'est trouvé (ou pour les noms de fichiers ne correspondant pas au modèle)
+    return 0
 
 
-def merge_pdf(output_name):
+def merge_pdf(web_name):
     """
     Function to merge the pdf files
-    :param output_name:
+    :param web_name:
     :return:
     """
-    print("Hello from merge_pdf")
+    output_name = web_name + str(datetime.date.today()) + ".pdf"
 
-    if output_name == "liberation":
-        print("MERGING PDF FOR LIBERATION")
-        # output_name = output_name + str(datetime.date.today()) + ".pdf"
-        # # Get download path
-        # download_path = get_download_path()
-        #
-        # # Delete the pdf files
-        # # delete_pdf_files(download_path, website_name=output_name, mode='before')
-        #
-        # # Get the pdf files
-        # pdf_files = [f for f in os.listdir(download_path) if f.endswith(".pdf")]
-        #
-        # # Merge the pdf files
-        # merger = PdfMerger()
-        #
-        # for pdf in pdf_files:
-        #     merger.append(os.path.join(download_path, pdf))
-        #
-        # merger.write(os.path.join(download_path, f"JOURNAL{output_name}"))
-        # merger.close()
-        #
-        # # Delete the pdf files
-        # # delete_pdf_files(download_path, website_name=output_name, mode='after')
+    # Get download path
+    download_path = get_download_path()
 
-    elif output_name == "lefigaro":
-        print("MERGING PDF FOR LEFIGARO")
-        # # Get download path
-        # download_path = get_download_path()
-        #
-        # # Delete the pdf files
-        # delete_pdf_files(download_path, website_name=output_name, mode='before')
-        #
-        # # Get the pdf files
-        # pdf_files = [f for f in os.listdir(download_path) if f.endswith(".pdf")]
-        #
-        # # Merge the pdf files
-        # merger = PdfMerger()
-        #
-        # for pdf in pdf_files:
-        #     merger.append(os.path.join(download_path, pdf))
-        #
-        # merger.write(os.path.join(download_path, f"JOURNAL{output_name}" + str(datetime.date.today()) + ".pdf"))
-        # merger.close()
-        #
-        # # Delete the pdf files
-        # delete_pdf_files(download_path, website_name=output_name, mode='after')
+    # Get the pdf files with this name "lacroixX 2023-11-11.pdf"
+    # pattern_web_name = fr"{web_name}\d{1, 2} \d{4}-\d{2}-\d{2}\.pdf"
+    pattern_web_name = fr"{web_name}(\d{{1,2}}) \d{{4}}-\d{{2}}-\d{{2}}\.pdf"
+    pdf_files = [f for f in os.listdir(download_path) if re.match(pattern_web_name, f)]
 
-    elif output_name == "lacroix":
-        output_name = output_name + str(datetime.date.today()) + ".pdf"
+    # Sort the pdf files by date
+    pdf_files.sort(key=lambda filename: extract_number(filename, pattern_web_name))
 
-        # Get download path
-        download_path = get_download_path()
+    # Merge the pdf files
+    merger = PdfMerger()
 
-        # Get the pdf files with this name "lacroixX 2023-11-11.pdf"
-        pdf_files = [f for f in os.listdir(download_path) if re.match(r"lacroix\d{1,2} \d{4}-\d{2}-\d{2}\.pdf", f)]
+    for pdf in pdf_files:
+        merger.append(os.path.join(download_path, pdf))
 
-        # Sort the pdf files by date
-        pdf_files.sort(key=extract_number)
+    merger.write(os.path.join(download_path, f"JOURNAL{output_name}"))
+    merger.close()
 
-        # Merge the pdf files
-        merger = PdfMerger()
-
-        for pdf in pdf_files:
-            merger.append(os.path.join(download_path, pdf))
-
-        merger.write(os.path.join(download_path, f"JOURNAL{output_name}"))
-        merger.close()
-
-        # Delete the pdf files
-        delete_pdf_files(download_path, files_name=pdf_files)
-
-    # else:
-    #     print(f"MERGING PDF FOR OTHERS MEDIA : {output_name.upper()}")
-    #     # Get download path
-    #     download_path = get_download_path()
-    #
-    #     # Get the pdf files
-    #     pdf_files = [f for f in os.listdir(download_path) if f.endswith(".pdf")]
-    #
-    #     # Merge the pdf files
-    #     merger = PdfMerger()
-    #
-    #     for pdf in pdf_files:
-    #         merger.append(os.path.join(download_path, pdf))
-    #
-    #     merger.write(os.path.join(download_path, f"JOURNAL{output_name}" + str(datetime.date.today()) + ".pdf"))
-    #     merger.close()
-    #
-    #     # Delete the pdf files
-    #     delete_pdf_files(download_path, files_name=pdf_files)
+    # Delete the pdf files
+    delete_pdf_files(download_path, files_name=pdf_files)

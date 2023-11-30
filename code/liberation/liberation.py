@@ -3,8 +3,7 @@ from utils.navigation_utils import navigation
 
 
 def liberation():
-    print("Hello from liberation.py")
-    print("Starting liberation.py")
+    print("\033[93m" + "LIBERATION" + "\033[0m")
 
     # Setup Driver
     web_driver = setup_driver('chrome')
@@ -19,4 +18,4 @@ def liberation():
     # Quit Driver
     quit_driver(web_driver)
 
-    print("Ending liberation.py")
+    print("\033[93m" + "END LIBERATION" + "\033[0m")

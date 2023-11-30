@@ -415,10 +415,15 @@ def automatise(driver, web_name, first_iteration=True):
             name += 1
 
 
-def navigation(driver, web_name):
-    print("\033[33m" + "### Navigation ### " + "\033[0m")
+def route_lacroix(driver, web_name):
+    """
+    Function to navigate on the website La Croix
 
-    if web_name == 'lacroix':
+    :param driver:
+    :param web_name:
+    :return:
+    """
+    try:
         click_on_cookies_popup(driver, web_name)
 
         # Click on se connecter button
@@ -443,10 +448,22 @@ def navigation(driver, web_name):
         automatise(driver, web_name)
 
         # Merge pdf
-        print("Merging pdf...")
         merge_pdf(web_name)
 
-    elif web_name == 'liberation':
+    except Exception as e:
+        print("Error while navigating on La Croix: ", e)
+        return
+
+
+def route_liberation(driver, web_name):
+    """
+    Function to navigate on the website Liberation
+
+    :param driver:
+    :param web_name:
+    :return:
+    """
+    try:
         # Switch iframe
         switch_iframe(driver, web_name, mode='iframe')
 
@@ -462,9 +479,6 @@ def navigation(driver, web_name):
         # Email and password
         input_email_password(driver, web_name)
 
-        # Click on keep me logged in
-        click_on_keep_me_logged_in(driver, web_name)
-
         # Click on login button
         click_on_login_button(driver, web_name)
 
@@ -478,8 +492,25 @@ def navigation(driver, web_name):
         automatise(driver, web_name)
 
         # Merge pdf
-        print("Merging pdf...")
         merge_pdf(web_name)
+
+    except Exception as e:
+        print("Error while navigating on Liberation: ", e)
+        return
+
+
+def navigation(driver, web_name):
+    print("\033[33m" + f"### Navigation {web_name.upper()} ### " + "\033[0m")
+
+    if web_name == 'lacroix':
+        route_lacroix(driver, web_name)
+
+    elif web_name == 'liberation':
+        route_liberation(driver, web_name)
+
+    else:
+        print("Website not found")
+        return
 
     # End
     time.sleep(10)
