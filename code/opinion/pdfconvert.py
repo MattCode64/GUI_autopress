@@ -77,10 +77,9 @@ def ConvertImagesToPdf(config_file):
 
         # Get every path of the images in the folder
         images = [os.path.join(path, fn) for fn in os.listdir(path) if fn.endswith('.png')]  # Filtrer pour les images
+        images.sort(key=lambda x: int(x.split('/')[-1].split('.')[0]))
 
         if images:
-            print(images)
-
             # Convert images to pdf
             with open(output_file, "wb") as f:
                 f.write(img2pdf.convert(images))

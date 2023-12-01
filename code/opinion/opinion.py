@@ -270,10 +270,6 @@ def QuitDriver(driver):
 
 def SetupDriver(browser_name):
     try:
-
-
-
-
         if browser_name.lower() == 'chrome':
             options = ChromeOptions()
             options.add_argument("--window-size=1080,1920")

@@ -43,7 +43,7 @@ def Screenshots(driver, config_file, page):
         print("Path of the folder: ", path)
 
         # Save the element as a png file
-        path = path + "\\{}.png".format(page)
+        path = path + "/{}.png".format(page)
         element.screenshot(path)
         print("~~~ Screenshot of page {} taken ~~~".format(page))
         print("Saved in {}".format(path))
