@@ -347,7 +347,7 @@ def input_text(driver, text):
 
 def get_email_password(web_name):
     """
-    Function to get email and password from the .env file
+    Function to get email and password from the ..env file
 
     :param web_name:
     :return:
@@ -459,49 +459,42 @@ def switch_iframe(driver, web_name, mode):
         print("Switched to iframe")
 
 
-def automatise_print(first_iteration, name):
+def automatise_print(first_iteration, name, os_system='windows'):
     """
     Function to automatise the saving of the pdf file
 
+    :param os_system:
     :param first_iteration:
     :param name:
     :return:
     """
-    if first_iteration is True:
-        time.sleep(2)
-        # Tabulate 5 times
-        tabulate(5, .5)
+    # Do a switch case for windows mac and linux
+    if os_system == 'windows':
+        if first_iteration is True:
+            time.sleep(2)
+            tabulate(5, .5)
+            enter(1, .5)
+            down_arrow(1, .5)
+            enter(1, .5)
+            tabulate(4, .5)
+            enter(1, .5)
+            save_file(1, name)
+            enter(1, .5)
+            ctrl_w(1, .5)
 
-        # Enter 1 time
-        enter(1, .5)
+        else:
+            time.sleep(2)
+            enter(1, .5)
+            win_tab(2, 1)
+            save_file(1, name)
+            enter(1, .5)
+            ctrl_w(1, .5)
 
-        # Down arrow 1 time
-        down_arrow(1, .5)
+    elif os_system == 'mac':
+        return
 
-        # Enter 1 time
-        enter(1, .5)
-
-        # Tabulate 4 times
-        tabulate(4, .5)
-
-        # Enter 1 time
-        enter(1, .5)
-
-        # Save the file
-        save_file(1, name)
-
-        # Enter 1 time
-        enter(1, .5)
-
-        # Close window
-        ctrl_w(1, .5)
-
-    else:
-        time.sleep(2)
-        enter(1, .5)
-        save_file(1, name)
-        enter(1, .5)
-        ctrl_w(1, .5)
+    elif os_system == 'linux':
+        return
 
 
 def automatise(driver, web_name, first_iteration=True):
@@ -519,14 +512,14 @@ def automatise(driver, web_name, first_iteration=True):
     while condition:
         if first_iteration:
             click_on_print_button(driver, web_name)
-            automatise_print(first_iteration, web_name + str(name))
+            automatise_print(first_iteration, web_name + str(name), os_system='windows')
             name += 1
             condition = click_on_next_page_button(driver, web_name)
             first_iteration = False
 
         else:
             click_on_print_button(driver, web_name)
-            automatise_print(first_iteration, web_name + str(name))
+            automatise_print(first_iteration, web_name + str(name), os_system='windows')
             condition = click_on_next_page_button(driver, web_name)
             name += 1
 

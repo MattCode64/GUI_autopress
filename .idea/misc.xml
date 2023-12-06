@@ -3,5 +3,5 @@
   <component name="Black">
     <option name="sdkName" value="Conda" />
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="Conda" project-jdk-type="Python SDK" />
+  <component name="ProjectRootManager" version="2" project-jdk-name="GUI_autopress" project-jdk-type="Python SDK" />
 </project>

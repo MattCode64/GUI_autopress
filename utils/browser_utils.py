@@ -53,9 +53,10 @@ def setup_driver(browser_name):
     try:
         if browser_name.lower() == 'chrome':
             options = ChromeOptions()
-            options.add_argument("--window-size=720,1280")
+            options.add_argument("--window-size=720,1080")
             options.add_experimental_option("excludeSwitches", ["enable-automation"])
             driver = webdriver.Chrome(options=options)
+            driver.set_page_load_timeout(30)
             print("Driver Initialized")
 
         elif browser_name.lower() == 'firefox':
@@ -75,6 +76,14 @@ def setup_driver(browser_name):
             raise ValueError("Unsupported browser")
 
         return driver
+
+    except ValueError as e:
+        print("Error while setup webdriver: ", e)
+        return
+
+    except TimeoutError as e:
+        print("Error while setup webdriver: ", e)
+        return
 
     except WebDriverException as e:
         print("Error while setup webdriver: ", e)

@@ -8,8 +8,8 @@
     },
     "credentials": {
         "lopinion": {
-            "email": "veidzedezdze.fr",
-            "password": "Prdezdezdez19!"
+            "email": "veille.presse@elysee.fr",
+            "password": "Presse2019!"
         },
         "lesechos": {
             "email": "armddzdezezde.fr",
@@ -33,7 +33,7 @@
         "image_dirOPI": "../../data/imagesOPI",
         "image_dirLE": "../../data/imagesLE",
         "html_file_path": "../../data/html/page.html",
-        "download_dir": "C:\\Users\\freir\\Downloads"
+        "download_dir": "/home/matthieu/Downloads"
     },
     "shadow_root": {
         "body": "body > epaper-application > div > view-publication",

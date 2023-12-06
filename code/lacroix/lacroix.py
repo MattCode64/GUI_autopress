@@ -1,3 +1,5 @@
+import sys
+sys.path.append("..")
 from utils.browser_utils import setup_driver, quit_driver, open_website
 from utils.navigation_utils import navigation
 
