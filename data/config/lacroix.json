@@ -1,0 +1,46 @@
+{
+  "cookies_button": {
+    "CSS_SELECTOR": "#didomi-notice-agree-button",
+    "full_XPATH": "/html/body/div[1]/div/div/div/div/div/div[3]/button[2]"
+  },
+  "se_connecter_button": {
+    "CSS_SELECTOR": "#__nuxt > main > div.issue-highlight > div.issue-highlight__actions > a.button.button--primary.track-cta-kiosque",
+    "full_XPATH": "/html/body/div[2]/main/div[1]/div[2]/a[1]"
+  },
+  "email": {
+    "CSS_SELECTOR": "#username",
+    "full_XPATH": "/html/body/div[2]/main/div[1]/form/input"
+  },
+  "password": {
+    "CSS_SELECTOR": "#password",
+    "full_XPATH": "/html/body/div[2]/main/div[1]/form/div[1]/input"
+  },
+  "keep_logged_in": {
+    "CSS_SELECTOR": "#connected",
+    "full_XPATH": "/html/body/div[2]/main/div[1]/form/div[2]/input"
+  },
+  "login": {
+    "CSS_SELECTOR": "#kc-login",
+    "full_XPATH": "/html/body/div[2]/main/div[1]/form/div[3]/input"
+  },
+  "read": {
+    "CSS_SELECTOR": "#__nuxt > main > div.issue-highlight > div > a",
+    "full_XPATH": "/html/body/div[2]/main/div[1]/div/a"
+  },
+  "full_screen": {
+    "CSS_SELECTOR": "#nav-right-pages > ul > li:nth-child(5) > button",
+    "full_XPATH": "/html/body/div[2]/header/nav/div/div[4]/ul/li[5]/button"
+  },
+  "print_button": {
+    "CSS_SELECTOR": "#nav-right-pages > ul > li:nth-child(1) > button",
+    "full_XPATH": "/html/body/div[2]/header/nav/div/div[4]/ul/li[1]/button"
+  },
+  "next_page_button": {
+    "CSS_SELECTOR": "#id61",
+    "full_XPATH": "/html/body/div[2]/div[2]/div/button[1]"
+  },
+  "page": {
+    "CSS_SELECTOR": "#\\32 9page-left-pdf",
+    "full_XPATH": "/html/body/div[2]/div[2]/div/ul/li[2]/div[2]/div/div/div[2]/canvas"
+  }
+}
