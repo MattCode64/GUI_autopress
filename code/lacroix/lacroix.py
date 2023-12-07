@@ -1,7 +1,8 @@
-import sys
-sys.path.append("..")
 from utils.browser_utils import setup_driver, quit_driver, open_website
 from utils.navigation_utils import navigation
+import sys
+import time
+sys.path.append("..")
 
 
 def lacroix():
@@ -13,6 +14,7 @@ def lacroix():
     # Open website with wait
     website_name = "lacroix"
     open_website(web_driver, website_name)
+    # time.sleep(500000)
 
     # Navigation and Automation
     navigation(web_driver, website_name)

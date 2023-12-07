@@ -53,7 +53,7 @@ def setup_driver(browser_name):
     try:
         if browser_name.lower() == 'chrome':
             options = ChromeOptions()
-            options.add_argument("--window-size=720,1080")
+            options.add_argument("--window-size=1920,1080")
             options.add_experimental_option("excludeSwitches", ["enable-automation"])
             driver = webdriver.Chrome(options=options)
             driver.set_page_load_timeout(30)
@@ -68,7 +68,7 @@ def setup_driver(browser_name):
         elif browser_name.lower() == 'edge':
             options = EdgeOptions()
             options.use_chromium = True
-            options.add_argument("--window-size=720,1280")
+            options.add_argument("--window-size=1000,1280")
             driver = webdriver.Edge(options=options)
             print("Driver Initialized")
 

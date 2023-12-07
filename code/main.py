@@ -6,7 +6,7 @@ from liberation.liberation import liberation
 def main():
     print("\033[93m" + "START" + "\033[0m")
     lacroix()
-    liberation()
+    # liberation()
     # figaro()
     print("\033[93m" + "END" + "\033[0m")
 

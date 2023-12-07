@@ -1,15 +1,17 @@
-import time
 import os
-from dotenv import load_dotenv
+import string
+import time
 
+from dotenv import load_dotenv
+from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
-from selenium.common.exceptions import WebDriverException
-from selenium.common.exceptions import TimeoutException
-from utils.config_utils import get_json_file
+
 from utils.autoui_utils import *
-from utils.manage_file_utils import merge_pdf
+from utils.config_utils import get_json_file
+from utils.manage_file_utils import merge_pdf, merge_pdfs, convert_png_to_pdf
 
 
 def click(driver):
@@ -269,10 +271,10 @@ def click_on_keep_me_logged_in(driver, web_name):
         XPATH_KEEP_ME_LOGGED_IN = get_json_file(web_name)["keep_logged_in"]["full_XPATH"]
 
         keep_me_logged_in = wait_for_element(driver, "XPATH", XPATH_KEEP_ME_LOGGED_IN)
-        print("Keep me logged in found")
+        # print("Keep me logged in found")
 
         click(keep_me_logged_in)
-        print("Clicked on keep me logged in (Unchecked)")
+        # print("Clicked on keep me logged in (Unchecked)")
         time.sleep(.5)
 
     except TimeoutException:
@@ -347,7 +349,7 @@ def input_text(driver, text):
 
 def get_email_password(web_name):
     """
-    Function to get email and password from the ..env file
+    Function to get email and password from the .env file
 
     :param web_name:
     :return:
@@ -459,7 +461,7 @@ def switch_iframe(driver, web_name, mode):
         print("Switched to iframe")
 
 
-def automatise_print(first_iteration, name, os_system='windows'):
+def automatise_print(first_iteration, name, os_system):
     """
     Function to automatise the saving of the pdf file
 
@@ -474,33 +476,117 @@ def automatise_print(first_iteration, name, os_system='windows'):
             time.sleep(2)
             tabulate(5, .5)
             enter(1, .5)
-            down_arrow(1, .5)
-            enter(1, .5)
-            tabulate(4, .5)
-            enter(1, .5)
+            alt_tab(1, .5)
             save_file(1, name)
             enter(1, .5)
-            ctrl_w(1, .5)
+            ctrl_w(1, .5, os_system)
 
         else:
             time.sleep(2)
+            tabulate(5, .5)
             enter(1, .5)
-            win_tab(2, 1)
+            alt_tab(1, .5)
             save_file(1, name)
             enter(1, .5)
-            ctrl_w(1, .5)
+            ctrl_w(1, .5, os_system)
+            # time.sleep(2)
+            # enter(1, .5)
+            # win_tab(2, 1)
+            # save_file(1, name)
+            # enter(1, .5)
+            # ctrl_w(1, .5)
 
     elif os_system == 'mac':
         return
 
     elif os_system == 'linux':
+        time.sleep(2)
+        tabulate(8, .5)
+        enter(1, .5)
+        save_file(1, name)
+        enter(1, .5)
+        ctrl_w(1, .5, os_system)
+
+
+def full_screen_mode(driver, web_name):
+    """
+    Function to put the browser in full screen mode
+
+    :param driver:
+    :param web_name:
+    :return:
+    """
+    try:
+        XPATH_FULL_SCREEN_BUTTON = get_json_file(web_name)["full_screen"]["full_XPATH"]
+
+        full_screen_button = wait_for_element(driver, "XPATH", XPATH_FULL_SCREEN_BUTTON)
+        # print("Full screen button found")
+
+        click(full_screen_button)
+        # print("Clicked on full screen button")
+        time.sleep(0.5)
+
+    except TimeoutException:
+        print("Full screen button not found (TimeoutException)")
+        return
+
+    except Exception as e:
+        print("Error while clicking on full screen button: ", e)
         return
 
 
-def automatise(driver, web_name, first_iteration=True):
+def take_screenshot(driver, web_name, output_file_name):
+    """
+    Function to take a screenshot
+
+    :param output_file_name:
+    :param driver:
+    :param web_name:
+    :return:
+    """
+    try:
+        XPATH_SCREENSHOT = get_json_file(web_name)["page"]["full_XPATH"]
+
+        screenshot_page = wait_for_element(driver, "XPATH", XPATH_SCREENSHOT)
+
+        # take screenshot with selenium in download folder
+        screenshot_page.screenshot(f"../data/imagesLC/{output_file_name}.png")
+        print("Screenshot taken")
+        time.sleep(0.5)
+
+    except TimeoutException:
+        print("Screenshot button not found (TimeoutException)")
+        return
+
+    except Exception as e:
+        print("Error while clicking on screenshot button: ", e)
+        return
+
+
+def automatise_print_for_lacroix(driver, web_name):
+    full_screen_mode(driver, web_name)
+    time.sleep(2)
+    condition = True
+    # list alphabet
+    i_letter = 0
+    alphabet = list(string.ascii_lowercase)
+    # While it can change page, take screenshot
+    while condition:
+        time.sleep(3)
+        output_file_name = f"{alphabet[i_letter]}_{web_name}"
+        # Take screenshot
+        take_screenshot(driver, web_name, output_file_name)
+        i_letter += 1
+        # Click on next page button
+        condition = click_on_next_page_button(driver, web_name)
+        print("Condition: ", condition)
+
+
+def automatise(driver, web_name, first_iteration=True, os_system='linux'):
     """
     Function to automatise the navigation on the website
 
+    :param os_system:
     :param driver:
     :param web_name:
     :param first_iteration:
@@ -510,18 +596,25 @@ def automatise(driver, web_name, first_iteration=True):
     name = 0
 
     while condition:
-        if first_iteration:
-            click_on_print_button(driver, web_name)
-            automatise_print(first_iteration, web_name + str(name), os_system='windows')
-            name += 1
-            condition = click_on_next_page_button(driver, web_name)
-            first_iteration = False
+        if web_name == 'liberation':
+            time.sleep(4.5)
+            if first_iteration:
+                click_on_print_button(driver, web_name)
+                automatise_print(first_iteration, web_name + str(name), os_system)
+                name += 1
+                condition = click_on_next_page_button(driver, web_name)
+                first_iteration = False
 
-        else:
-            click_on_print_button(driver, web_name)
-            automatise_print(first_iteration, web_name + str(name), os_system='windows')
-            condition = click_on_next_page_button(driver, web_name)
-            name += 1
+            else:
+                print("In else because not first iteration")
+                # For loop to click two times on the next page button
+                for i in range(2):
+                    time.sleep(2)
+                    print("In for loop ", i)
+                    condition = click_on_next_page_button(driver, web_name)
+
+                click_on_print_button(driver, web_name)
+                name += 1
 
 
 def route_lacroix(driver, web_name):
@@ -542,22 +635,27 @@ def route_lacroix(driver, web_name):
         input_email_password(driver, web_name)
 
         # Click on keep me logged in
-        click_on_keep_me_logged_in(driver, web_name)
+        # print("Click on keep me logged in")
+        # click_on_keep_me_logged_in(driver, web_name)
 
         # Click on login button
+        print("Click on login button")
         click_on_login_button(driver, web_name)
 
         # Click on read newspaper
+        print("Click on read newspaper")
         click_on_read_newspaper(driver, web_name)
 
         # Click on more options button
-        click_on_more_options_button(driver, web_name)
+        # click_on_more_options_button(driver, web_name)
 
         # While there is a next page button, click on it
-        automatise(driver, web_name)
+        automatise_print_for_lacroix(driver, web_name)
 
         # Merge pdf
-        merge_pdf(web_name)
+        convert_png_to_pdf()
+        merge_pdfs()
+
 
     except Exception as e:
         print("Error while navigating on La Croix: ", e)

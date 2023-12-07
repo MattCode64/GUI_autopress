@@ -1,9 +1,43 @@
-import os
-import re
 import datetime
+import os
 import platform
+import re
+
+from PIL import Image
+from PyPDF2 import PdfMerger, PdfFileReader, PdfFileWriter
+
 from utils.config_utils import get_json_file, write_json_file
-from PyPDF2 import PdfMerger
+
+
+# function that convert png to pdf in the folder
+def convert_png_to_pdf():
+    directory = "../data/imagesLC/"
+    for filename in os.listdir(directory):
+        if filename.endswith(".png"):
+            image_path = os.path.join(directory, filename)
+            image = Image.open(image_path)
+            pdf_path = image_path.replace(".png", ".pdf")
+            image.convert('RGB').save(pdf_path, "PDF")
+
+
+def merge_pdfs():
+    input_dir = "../data/imagesLC/"
+    output_file = "../data/imagesLC/merged_document.pdf"
+
+    # Obtenir une liste triée des fichiers PDF dans le dossier par nom
+    pdf_files = sorted([item for item in os.listdir(input_dir) if item.endswith('.pdf')])
+
+    pdf_writer = PdfFileWriter()
+
+    for pdf_file in pdf_files:
+        file_path = os.path.join(input_dir, pdf_file)
+        pdf_reader = PdfFileReader(file_path)
+
+        for page in range(pdf_reader.getNumPages()):
+            pdf_writer.addPage(pdf_reader.getPage(page))
+
+    with open(output_file, 'wb') as output:
+        pdf_writer.write(output)
 
 
 def delete_pdf_files(path, files_name):
