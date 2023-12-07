@@ -20,9 +20,9 @@ def convert_png_to_pdf():
             image.convert('RGB').save(pdf_path, "PDF")
 
 
-def merge_pdfs():
+def merge_pdfs(output_name="JournalLacroix.pdf"):
     input_dir = "../data/imagesLC/"
-    output_file = "../data/imagesLC/merged_document.pdf"
+    output_file = f"../data/imagesLC/{output_name}"
 
     # Obtenir une liste triée des fichiers PDF dans le dossier par nom
     pdf_files = sorted([item for item in os.listdir(input_dir) if item.endswith('.pdf')])
@@ -38,6 +38,13 @@ def merge_pdfs():
 
     with open(output_file, 'wb') as output:
         pdf_writer.write(output)
+
+
+def delete_png_files():
+    directory = "../data/imagesLC/"
+    for filename in os.listdir(directory):
+        if filename.endswith(".png"):
+            os.remove(os.path.join(directory, filename))
 
 
 def delete_pdf_files(path, files_name):

@@ -11,7 +11,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 
 from utils.autoui_utils import *
 from utils.config_utils import get_json_file
-from utils.manage_file_utils import merge_pdf, merge_pdfs, convert_png_to_pdf
+from utils.manage_file_utils import merge_pdf, merge_pdfs, convert_png_to_pdf, delete_png_files
 
 
 def click(driver):
@@ -572,11 +572,13 @@ def automatise_print_for_lacroix(driver, web_name):
     alphabet = list(string.ascii_lowercase)
     # While it can change page, take screenshot
     while condition:
-        time.sleep(3)
+        time.sleep(5)
         output_file_name = f"{alphabet[i_letter]}_{web_name}"
         # Take screenshot
         take_screenshot(driver, web_name, output_file_name)
         i_letter += 1
+        convert_png_to_pdf()
+        delete_png_files()
         # Click on next page button
         condition = click_on_next_page_button(driver, web_name)
         print("Condition: ", condition)
@@ -653,9 +655,7 @@ def route_lacroix(driver, web_name):
         automatise_print_for_lacroix(driver, web_name)
 
         # Merge pdf
-        convert_png_to_pdf()
         merge_pdfs()
-
 
     except Exception as e:
         print("Error while navigating on La Croix: ", e)
